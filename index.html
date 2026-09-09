@@ -331,6 +331,15 @@
   }
   .tmeta .st.live{color:var(--live);text-shadow:0 0 12px rgba(255,59,59,.6);}
   .tmeta .dot{width:16px;height:16px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite;flex-shrink:0;box-shadow:0 0 10px var(--live);}
+  /* Freeform ticker messages (empty states, prompts) are full sentences, not the short
+     compact status text .st is built for -- reusing .st's white-space:nowrap on one of these
+     let it grow wider than the screen and get silently clipped off both edges in portrait,
+     instead of ever wrapping. This variant actually wraps and stays within the viewport. */
+  .tchip .tmsg{
+    font-family:'Orbitron',sans-serif;font-weight:600;font-size:clamp(15px,2.3cqh,21px);
+    color:var(--chrome);letter-spacing:.3px;white-space:normal;text-align:center;line-height:1.5;
+    max-width:min(600px,84cqw);
+  }
 
   /* ---------- MLB baserunner diamond / NFL down-distance ---------- */
   .tsit{display:flex;align-items:center;gap:16px;}
@@ -813,7 +822,7 @@
     }
 
     if(message){
-      mainRail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="st">' + message + '</span></div></div>';
+      mainRail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="tmsg">' + message + '</span></div></div>';
       mainRail.style.animation = 'none';
       mainBar.classList.add('static');
       return;
@@ -871,7 +880,7 @@
   var MIN_CHIPS_TO_SCROLL = 4;
   function fillTickerRail(rail, container, chipsHtml, secondsPerChip, minSeconds){
     if(chipsHtml.length === 0){
-      rail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="st">No games in view right now.</span></div></div>';
+      rail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="tmsg">No games in view right now.</span></div></div>';
       rail.style.animation = 'none';
       container.classList.remove('static');
       return;
