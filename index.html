@@ -1101,6 +1101,31 @@
     // else: already launched from the home screen icon, already chrome-free -- nothing to do.
   });
 
+  // ---------- keep the screen awake ----------
+  // A kiosk display that goes to sleep after the phone/tablet's normal idle timeout defeats
+  // the whole point. The Screen Wake Lock API tells the OS to hold the screen on while this
+  // tab is visible -- supported on iOS 16.4+ Safari and Chromium-based browsers. It's
+  // silently a no-op on anything older, so nothing breaks there, it just won't help.
+  var wakeLock = null;
+  async function requestWakeLock(){
+    if(!('wakeLock' in navigator)) return;
+    try{
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', function(){ wakeLock = null; });
+    }catch(err){
+      // request can be refused (e.g. low battery, or the tab isn't visible yet) -- it'll be
+      // retried on the next visibilitychange, so just let it go quiet here.
+      wakeLock = null;
+    }
+  }
+  document.addEventListener('visibilitychange', function(){
+    // the lock is auto-released whenever the tab is backgrounded (app-switch, screen lock,
+    // etc.) and never re-granted automatically -- has to be re-requested by hand every time
+    // the page becomes visible again.
+    if(document.visibilityState === 'visible') requestWakeLock();
+  });
+  requestWakeLock();
+
   // ---------- clock ----------
   function tickClock(){
     var d = new Date();
