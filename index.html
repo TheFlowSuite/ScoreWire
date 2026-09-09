@@ -142,6 +142,9 @@
     cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .15s ease;white-space:nowrap;
   }
   .viewToggle button.active{background:var(--neon-cyan);color:#001217;box-shadow:0 0 16px -2px var(--neon-cyan) inset;}
+  /* thin dividers between the four segments so they read as separate sections rather than
+     one continuous bar. */
+  .viewToggle button + button{border-left:1px solid rgba(255,255,255,.14);}
   .viewToggle button .liveDot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:6px;box-shadow:0 0 6px var(--live);animation:pulse 1.4s infinite;}
 
   /* Only screens this wide have room to lay everything out inline on one row -- a TV or a
