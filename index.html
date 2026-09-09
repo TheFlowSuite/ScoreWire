@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ScoreWire</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8Y2xpcFBhdGggaWQ9InNjbGlwIj4KICAgICAgPHRleHQgeD0iMzIiIHk9IjQ3IiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UzwvdGV4dD4KICAgIDwvY2xpcFBhdGg+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InN1biIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmQyM2YiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjUiIHN0b3AtY29sb3I9IiNmZjJlYzQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOWIzMGZmIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJib3JkZXIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDBmMGZmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmMmVjNCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdzaGFkZSIgY3g9IjMwJSIgY3k9IjE4JSIgcj0iODUlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMWExMjI0Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzA1MDMwOCIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxmaWx0ZXIgaWQ9Imdsb3dTb2Z0IiB4PSItODAlIiB5PSItODAlIiB3aWR0aD0iMjYwJSIgaGVpZ2h0PSIyNjAlIj4KICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNC4yIi8+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9Imdsb3dUaWdodCIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjEuNSIvPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxyZWN0IHg9IjEuNCIgeT0iMS40IiB3aWR0aD0iNjEuMiIgaGVpZ2h0PSI2MS4yIiByeD0iMTQiIGZpbGw9InVybCgjYmdzaGFkZSkiLz4KICA8dGV4dCB4PSIzMiIgeT0iNDciIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXNpemU9IjQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBmMGZmIiBmaWx0ZXI9InVybCgjZ2xvd1NvZnQpIiBvcGFjaXR5PSIwLjM1Ij5TPC90ZXh0PgogIDx0ZXh0IHg9IjMyIiB5PSI0NyIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZjJlYzQiIGZpbHRlcj0idXJsKCNnbG93U29mdCkiIG9wYWNpdHk9IjAuNCI+UzwvdGV4dD4KICA8dGV4dCB4PSIzMiIgeT0iNDciIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXNpemU9IjQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmYyZWM0IiBmaWx0ZXI9InVybCgjZ2xvd1RpZ2h0KSIgb3BhY2l0eT0iMC41NSI+UzwvdGV4dD4KICA8ZyBjbGlwLXBhdGg9InVybCgjc2NsaXApIj4KICAgIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0idXJsKCNzdW4pIi8+CiAgICA8cmVjdCB4PSIwIiB5PSIyOSIgd2lkdGg9IjY0IiBoZWlnaHQ9IjIuMiIgZmlsbD0iIzA1MDMwOCIvPgogICAgPHJlY3QgeD0iMCIgeT0iMzQiIHdpZHRoPSI2NCIgaGVpZ2h0PSIyLjQiIGZpbGw9IiMwNTAzMDgiLz4KICAgIDxyZWN0IHg9IjAiIHk9IjM5LjQiIHdpZHRoPSI2NCIgaGVpZ2h0PSIyLjYiIGZpbGw9IiMwNTAzMDgiLz4KICAgIDxyZWN0IHg9IjAiIHk9IjQ1IiB3aWR0aD0iNjQiIGhlaWdodD0iMi44IiBmaWxsPSIjMDUwMzA4Ii8+CiAgPC9nPgogIDx0ZXh0IHg9IjMyIiB5PSI0NyIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzhmZjlmZiIgc3Ryb2tlLXdpZHRoPSIxLjEiIG9wYWNpdHk9IjAuOSI+UzwvdGV4dD4KICA8cmVjdCB4PSIxLjQiIHk9IjEuNCIgd2lkdGg9IjYxLjIiIGhlaWdodD0iNjEuMiIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjYm9yZGVyKSIgc3Ryb2tlLXdpZHRoPSIyLjYiLz4KPC9zdmc+Cg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Orbitron:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --panel:#141926;
+    --line:#262e42;
+    --text:#eef1f8;
+    --text-dim:#8993ab;
+    --live:#ff3b3b;
+    --live-glow:rgba(255,59,59,.35);
+    --gold:#ffb020;
+    --mlb:#7a1fd6;
+    --nba:#e0651f;
+    --nfl:#2e6bff;
+    --nhl:#16b3a3;
+    --ncaaf:#b5342d;
+    --ncaab:#d6006c;
+    --radius:10px;
+    --neon-pink:#ff2ec4;
+    --neon-cyan:#00f0ff;
+    --neon-purple:#9b30ff;
+    --chrome:#e8f4ff;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;color:var(--text);
+    background:#000;
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    user-select:none;
+  }
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh;position:relative;}
+  /* faint CRT scanline overlay across the whole app */
+  #app::after{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:50;
+    background:repeating-linear-gradient(
+      0deg, rgba(0,0,0,.18) 0px, rgba(0,0,0,.18) 1px,
+      transparent 1px, transparent 3px
+    );
+    mix-blend-mode:overlay;
+    opacity:.5;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    display:flex;align-items:center;gap:14px;
+    padding:10px 18px;
+    background:#000;
+    border-bottom:1px solid var(--neon-pink);
+    box-shadow:0 1px 14px -2px rgba(255,46,196,.55), 0 2px 30px -8px rgba(0,240,255,.3);
+    flex-shrink:0;
+    transition:border-color .6s ease, box-shadow .6s ease;
+    z-index:10;
+  }
+  header.hidden{border-bottom-color:transparent;box-shadow:none;}
+  header.hidden > *:not(.brand){opacity:0;pointer-events:none;}
+  header > *:not(.brand){transition:opacity .5s ease;}
+  .brand{display:flex;align-items:baseline;gap:8px;margin-right:auto;}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--live);box-shadow:0 0 10px var(--live-glow);animation:pulse 1.6s infinite;}
+  .brand h1{
+    font-family:'Orbitron',sans-serif;font-weight:800;font-size:24px;letter-spacing:1.5px;margin:0;text-transform:uppercase;
+    background:linear-gradient(180deg,#fff, var(--neon-cyan) 60%, var(--neon-pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 18px rgba(0,240,255,.5);
+  }
+  .brand h1 span{
+    background:linear-gradient(180deg,#fff, var(--neon-pink) 55%, var(--neon-purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 18px rgba(255,46,196,.6);
+  }
+  .clock{
+    font-family:'Orbitron',sans-serif;font-weight:600;font-size:18px;color:var(--neon-cyan);letter-spacing:1px;
+    min-width:150px;text-align:right;text-shadow:0 0 10px rgba(0,240,255,.5);
+  }
+
+  .pills{display:flex;gap:6px;flex-wrap:wrap;}
+  .pill{
+    padding:7px 12px;border-radius:6px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);color:var(--text-dim);
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:11px;
+    cursor:pointer;letter-spacing:1px;transition:all .15s ease;white-space:nowrap;text-transform:uppercase;
+  }
+  .pill:hover{border-color:var(--neon-cyan);color:var(--chrome);}
+  .pill.active{color:#fff;border-color:transparent;text-shadow:0 0 8px rgba(255,255,255,.7);}
+  .pill[data-league="all"].active{background:var(--neon-purple);box-shadow:0 0 16px -2px var(--neon-purple);}
+  .pill[data-league="mlb"].active{background:var(--mlb);box-shadow:0 0 16px -2px var(--mlb);}
+  .pill[data-league="nba"].active{background:var(--nba);box-shadow:0 0 16px -2px var(--nba);}
+  .pill[data-league="nfl"].active{background:var(--nfl);box-shadow:0 0 16px -2px var(--nfl);}
+  .pill[data-league="nhl"].active{background:var(--nhl);box-shadow:0 0 16px -2px var(--nhl);}
+  .pill[data-league="ncaaf"].active{background:var(--ncaaf);box-shadow:0 0 16px -2px var(--ncaaf);}
+  .pill[data-league="ncaab"].active{background:var(--ncaab);box-shadow:0 0 16px -2px var(--ncaab);}
+
+  .iconbtn{
+    width:34px;height:34px;border-radius:6px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);color:var(--text-dim);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:16px;flex-shrink:0;transition:all .15s ease;
+  }
+  .iconbtn:hover{color:var(--neon-cyan);border-color:var(--neon-cyan);box-shadow:0 0 12px -2px var(--neon-cyan);}
+  .viewToggle{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .viewToggle button{
+    padding:7px 14px;background:rgba(255,255,255,.03);color:var(--text-dim);border:none;
+    font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+    cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .15s ease;
+  }
+  .viewToggle button.active{background:var(--neon-cyan);color:#001217;box-shadow:0 0 16px -2px var(--neon-cyan) inset;}
+  .viewToggle button .liveDot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:6px;box-shadow:0 0 6px var(--live);animation:pulse 1.4s infinite;}
+
+  /* ---------- MAIN ---------- */
+  main{flex:1;overflow:hidden;position:relative;}
+  .view{position:absolute;inset:0;overflow-y:auto;padding:22px;display:none;}
+  .view.active{display:block;}
+  .leagueGroup{margin-bottom:26px;}
+  .leagueGroup h2{
+    font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    margin:0 0 10px;color:var(--chrome);display:flex;align-items:center;gap:10px;
+    text-shadow:0 0 8px rgba(232,244,255,.25);
+  }
+  .leagueGroup h2 .chip{width:9px;height:9px;border-radius:2px;box-shadow:0 0 8px currentColor;}
+  /* auto-fit (not auto-fill) lets real cards claim the space empty phantom columns would
+     otherwise reserve, so a handful of games grow to fill the row, settling back toward the
+     260px floor as more are packed in. max-width on .card caps how big any one card gets --
+     deliberately not folded into the grid-template-columns function itself (wrapping the 1fr in
+     min() there breaks Chromium's auto-fit column-count math and collapses everything to one
+     giant column). justify-items:center keeps a capped card centered in its wider cell. */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;justify-items:center;}
+  .card{
+    container-type:inline-size;
+    width:100%;max-width:520px;
+    background:linear-gradient(160deg, rgba(155,48,255,.06), rgba(0,240,255,.03) 60%), var(--panel);
+    border:1px solid var(--line);border-left:4px solid #444;
+    border-radius:var(--radius);padding:14px 16px;
+  }
+  .card .status{
+    display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-dim);margin-bottom:10px;
+    text-transform:uppercase;letter-spacing:1px;font-family:'Orbitron',sans-serif;font-weight:600;
+  }
+  .card .status.live{color:var(--live);font-weight:700;text-shadow:0 0 8px rgba(255,59,59,.5);}
+  .card .status .lv{display:flex;align-items:center;gap:6px;}
+  .card .status .lv .dot{width:7px;height:7px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite;box-shadow:0 0 8px var(--live);}
+  .team-row{display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:6px;transition:background .15s ease;}
+  .team-row.clickable{cursor:pointer;}
+  .team-row.clickable:hover{background:rgba(255,255,255,.05);}
+  .team-row.favorited{background:rgba(255,176,32,.07);}
+  .team-row.favorited.clickable:hover{background:rgba(255,176,32,.12);}
+  .team-row .who{display:flex;align-items:center;gap:10px;min-width:0;}
+  .team-row img{width:26px;height:26px;object-fit:contain;flex-shrink:0;}
+  .team-row .name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .team-row .name.winner{color:#fff;}
+  .team-row .name.loser{color:var(--text-dim);}
+  .team-row .score{
+    font-family:'Teko',sans-serif;font-size:26px;font-weight:600;min-width:34px;text-align:right;
+    text-shadow:0 0 10px rgba(0,240,255,.35);
+  }
+
+  /* Scale each card's own content to its own rendered width (cqw = 1% of the card's inline
+     size) so a big card (few games) shows big logos/scores, not just more empty padding, and a
+     narrow card (many games) settles back to today's compact sizing. Browsers without container
+     query units simply ignore these and keep the plain pixel sizes set above. */
+  .card .status{font-size:clamp(11px, 2.6cqw, 14px);margin-bottom:clamp(8px, 2.4cqw, 14px);}
+  .team-row img{width:clamp(26px, 8cqw, 46px);height:clamp(26px, 8cqw, 46px);}
+  .team-row .name{font-size:clamp(14px, 3.8cqw, 20px);}
+  .team-row .score{font-size:clamp(26px, 8.5cqw, 44px);min-width:clamp(34px, 9cqw, 54px);}
+  .team-row{padding:clamp(4px, 1.2cqw, 8px) clamp(6px, 1.6cqw, 10px);}
+  .card{padding:clamp(14px, 4cqw, 22px) clamp(16px, 4.6cqw, 26px);}
+
+  .empty{color:var(--text-dim);font-size:14px;padding:8px 2px;}
+  .tracked-empty{
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    min-height:55vh;max-width:440px;margin:0 auto;padding:0 20px;
+    font-family:'Orbitron',sans-serif;font-size:15px;letter-spacing:.4px;line-height:1.6;
+  }
+
+  /* ---------- My Teams: a full-bleed ticker, reusing .tchip markup at the same size as the
+     main ticker -- scoped to games involving a favorited team. ---------- */
+  #view-tracked{padding:0;}
+  #view-tracked.active{display:flex;flex-direction:column;}
+  #trackedTickerBar{
+    flex:1;min-height:0;position:relative;overflow:hidden;
+    display:flex;align-items:center;
+    /* identical recipe to #tickerBar (the main ticker), so the two backgrounds match exactly */
+    background:
+      linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,.7) 55%, rgba(0,0,0,.4) 100%),
+      repeating-linear-gradient(90deg, rgba(0,240,255,.07) 0px, rgba(0,240,255,.07) 1px, transparent 1px, transparent 64px),
+      repeating-linear-gradient(0deg, rgba(255,46,196,.05) 0px, rgba(255,46,196,.05) 1px, transparent 1px, transparent 44px),
+      radial-gradient(ellipse 70% 90% at 50% 50%, rgba(255,46,196,.04), transparent 70%),
+      #000;
+  }
+  #trackedTickerBar .rail{display:flex;align-items:stretch;white-space:nowrap;height:100%;}
+
+  /* ---------- TICKER STRIP (Glance LED-inspired) ---------- */
+  #tickerBar{
+    position:absolute;left:0;right:0;bottom:0;height:100%;
+    display:flex;align-items:center;overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,.7) 55%, rgba(0,0,0,.4) 100%),
+      repeating-linear-gradient(90deg, rgba(0,240,255,.07) 0px, rgba(0,240,255,.07) 1px, transparent 1px, transparent 64px),
+      repeating-linear-gradient(0deg, rgba(255,46,196,.05) 0px, rgba(255,46,196,.05) 1px, transparent 1px, transparent 44px),
+      radial-gradient(ellipse 70% 90% at 50% 50%, rgba(255,46,196,.04), transparent 70%),
+      #000;
+  }
+  #tickerBar .rail{display:flex;align-items:stretch;white-space:nowrap;animation:scroll 54s linear infinite;height:100%;}
+  #tickerBar.static, #trackedTickerBar.static{justify-content:center;}
+  @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+  .tchip{
+    display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:clamp(12px,2.8vh,28px);
+    padding:0 clamp(44px,8vh,92px);height:100%;
+    flex-shrink:0;
+  }
+  .tgame{display:flex;align-items:center;gap:clamp(28px,4.8vh,52px);}
+  .tteam{display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0;}
+  .tteam .tlogo{
+    width:clamp(104px,26vh,280px);height:clamp(104px,26vh,280px);object-fit:contain;
+    filter:drop-shadow(0 0 20px var(--tc, rgba(255,255,255,.2)));
+  }
+  .tteam .tabbr{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(20px,3.1vh,30px);
+    letter-spacing:2px;color:var(--chrome);text-transform:uppercase;
+    text-shadow:0 0 10px rgba(232,244,255,.35);
+  }
+  .tscore{
+    display:flex;align-items:center;gap:clamp(16px,2.8vh,32px);
+    font-family:'Teko',sans-serif;font-weight:700;color:#fff;
+    font-size:clamp(72px,20vh,184px);line-height:1;
+    text-shadow:0 0 26px rgba(0,240,255,.45), 0 0 54px rgba(255,46,196,.28);
+  }
+  .tscore .dash{color:var(--neon-pink);font-size:.55em;text-shadow:0 0 16px rgba(255,46,196,.6);}
+  .tscore .s{display:inline-block;}
+  .tscore .s.flash{animation:scoreFlash .9s ease-out;}
+  .team-row .score.flash{display:inline-block;animation:scoreFlash .9s ease-out;}
+  @keyframes scoreFlash{
+    0%{transform:scale(1);}
+    28%{transform:scale(1.25);filter:brightness(1.7) drop-shadow(0 0 20px var(--neon-cyan));}
+    100%{transform:scale(1);}
+  }
+  /* Bigger, longer, gold-toned flash for a score change in a game with a favorited team --
+     the ordinary cyan flash above still covers everyone else. */
+  .tscore .s.flash-fav{animation:scoreFlashFav 1.3s ease-out;}
+  .team-row .score.flash-fav{display:inline-block;animation:scoreFlashFav 1.3s ease-out;}
+  @keyframes scoreFlashFav{
+    0%{transform:scale(1);}
+    20%{transform:scale(1.45);filter:brightness(2) drop-shadow(0 0 16px var(--gold)) drop-shadow(0 0 36px var(--gold));}
+    55%{transform:scale(1.12);filter:brightness(1.5) drop-shadow(0 0 20px var(--gold));}
+    100%{transform:scale(1);}
+  }
+  /* No border/highlight for favorited teams in either ticker -- both stay purely hands-off
+     displays. The favoriting affordance (and its visual feedback) lives only in the card grids. */
+  .card.pinned{box-shadow:-6px 0 16px -8px var(--gold), inset 0 0 0 1px rgba(255,176,32,.3);}
+
+  .favstar{
+    display:inline-block;line-height:0;color:rgba(255,255,255,.22);
+    width:clamp(18px,2.6vh,26px);height:clamp(18px,2.6vh,26px);
+    transition:color .15s ease, filter .15s ease;
+  }
+  .favstar svg{width:100%;height:100%;display:block;fill:currentColor;}
+  .favstar.active{color:var(--gold);filter:drop-shadow(0 0 8px rgba(255,176,32,.85));}
+  .favstar.small{width:15px;height:15px;flex-shrink:0;}
+  .tmeta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;}
+  .tmline{display:flex;align-items:center;justify-content:center;gap:20px;}
+  .tmeta .lg{
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(16px,2.4vh,22px);letter-spacing:1.5px;
+    padding:4px 16px;border-radius:6px;color:#fff;background:transparent;
+    border:1.5px solid currentColor;
+  }
+  .tchip[data-l="mlb"] .tmeta .lg{color:var(--mlb);box-shadow:0 0 14px -2px var(--mlb);}
+  .tchip[data-l="nba"] .tmeta .lg{color:var(--nba);box-shadow:0 0 14px -2px var(--nba);}
+  .tchip[data-l="nfl"] .tmeta .lg{color:var(--nfl);box-shadow:0 0 14px -2px var(--nfl);}
+  .tchip[data-l="nhl"] .tmeta .lg{color:var(--nhl);box-shadow:0 0 14px -2px var(--nhl);}
+  .tchip[data-l="ncaaf"] .tmeta .lg{color:var(--ncaaf);box-shadow:0 0 14px -2px var(--ncaaf);}
+  .tchip[data-l="ncaab"] .tmeta .lg{color:var(--ncaab);box-shadow:0 0 14px -2px var(--ncaab);}
+  .tmeta .st{
+    font-family:'Orbitron',sans-serif;font-size:clamp(18px,2.6vh,26px);color:var(--chrome);font-weight:600;white-space:nowrap;
+    display:flex;align-items:center;gap:12px;letter-spacing:.5px;
+  }
+  .tmeta .st.live{color:var(--live);text-shadow:0 0 12px rgba(255,59,59,.6);}
+  .tmeta .dot{width:16px;height:16px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite;flex-shrink:0;box-shadow:0 0 10px var(--live);}
+
+  /* ---------- MLB baserunner diamond / NFL down-distance ---------- */
+  .tsit{display:flex;align-items:center;gap:16px;}
+  .tsit .tdiamond{width:clamp(40px,6vh,60px);height:clamp(40px,6vh,60px);flex-shrink:0;}
+  .tsit .tball{width:clamp(36px,5.2vh,52px);height:auto;flex-shrink:0;}
+  .tsit .bso{
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(18px,2.8vh,26px);
+    letter-spacing:.6px;color:var(--gold);white-space:nowrap;
+    text-shadow:0 0 12px rgba(255,176,32,.55);
+  }
+  .tsit.redzone .bso{color:var(--live);text-shadow:0 0 12px rgba(255,59,59,.6);}
+  .tsit.powerplay .bso{color:var(--neon-cyan);text-shadow:0 0 14px rgba(0,240,255,.7);animation:ppPulse 1s ease-in-out infinite;}
+  @keyframes ppPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+  .tabbr .tball{width:26px;height:auto;flex-shrink:0;}
+
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+
+  footer{
+    flex-shrink:0;display:flex;justify-content:space-between;align-items:center;
+    padding:6px 18px;font-size:11px;letter-spacing:.3px;color:var(--text-dim);
+    background:#000;border-top:1px solid var(--neon-cyan);
+    box-shadow:0 -1px 14px -3px rgba(0,240,255,.4);
+    transition:border-color .6s ease, box-shadow .6s ease;
+  }
+  footer.hidden{border-top-color:transparent;box-shadow:none;}
+  footer.hidden > *{opacity:0;pointer-events:none;}
+  footer > *{transition:opacity .5s ease;}
+  #status{white-space:nowrap;color:var(--neon-cyan);}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+
+  /* ---------- CRT boot-up / refresh flicker ---------- */
+  .boot-overlay{
+    position:absolute;inset:0;z-index:100;
+    background:#000;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    transition:opacity .45s ease;
+  }
+  .boot-overlay::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(0,240,255,.06) 0px, rgba(0,240,255,.06) 1px, transparent 1px, transparent 3px);
+  }
+  .boot-overlay.hide{opacity:0;pointer-events:none;}
+  .boot-text{
+    font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(28px,6vw,60px);letter-spacing:5px;
+    color:#fff;text-shadow:0 0 24px rgba(0,240,255,.6);
+    animation:bootFlicker 1.1s steps(1,end) 1;
+  }
+  .boot-text span{color:var(--neon-pink);text-shadow:0 0 24px rgba(255,46,196,.65);}
+  .boot-sub{
+    font-family:'Orbitron',sans-serif;font-weight:600;font-size:13px;letter-spacing:3px;color:var(--neon-cyan);
+    opacity:.85;animation:pulse 1.2s infinite;
+  }
+  @keyframes bootFlicker{
+    0%{opacity:0;}
+    8%{opacity:1;}
+    14%{opacity:.2;}
+    20%{opacity:1;}
+    28%{opacity:.4;}
+    36%{opacity:1;}
+    100%{opacity:1;}
+  }
+  @keyframes refreshFlicker{
+    0%{filter:brightness(1);}
+    15%{filter:brightness(1.7) contrast(1.1);}
+    30%{filter:brightness(.88);}
+    45%{filter:brightness(1.35);}
+    100%{filter:brightness(1);}
+  }
+  #app.refresh-flicker{animation:refreshFlicker .26s steps(1,end);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <div class="brand"><span class="dot"></span><h1>Score<span>Wire</span></h1></div>
+    <div class="pills" id="leaguePills">
+      <button class="pill active" data-league="all">ALL</button>
+      <button class="pill" data-league="mlb">MLB</button>
+      <button class="pill" data-league="nba">NBA</button>
+      <button class="pill" data-league="nfl">NFL</button>
+      <button class="pill" data-league="nhl">NHL</button>
+      <button class="pill" data-league="ncaaf">NCAAF</button>
+      <button class="pill" data-league="ncaab">NCAAB</button>
+    </div>
+    <div class="viewToggle">
+      <button data-view="ticker" class="active">Ticker</button>
+      <button data-view="scoreboard">Scoreboard</button>
+      <button data-view="live">Live<span class="liveDot"></span></button>
+      <button data-view="tracked">My Teams</button>
+    </div>
+    <button class="iconbtn" id="refreshBtn" title="Refresh now">&#8635;</button>
+    <button class="iconbtn" id="fsBtn" title="Fullscreen">&#9974;</button>
+    <div class="clock" id="clock">--:--</div>
+  </header>
+
+  <main>
+    <div class="view" id="view-scoreboard"></div>
+    <div class="view" id="view-live"></div>
+    <div class="view" id="view-tracked">
+      <div id="trackedTickerBar"><div class="rail" id="trackedTickerRail"></div></div>
+    </div>
+    <div class="view" id="view-ticker">
+      <div id="tickerBar"><div class="rail" id="tickerRail"></div></div>
+    </div>
+  </main>
+
+  <footer id="footer">
+    <span id="status">Loading scores&hellip;</span>
+    <span>Tap anywhere to show controls &middot; Data via ESPN</span>
+  </footer>
+
+  <div id="bootOverlay" class="boot-overlay">
+    <div class="boot-text">SCORE<span>WIRE</span></div>
+    <div class="boot-sub">LOADING SCORES&hellip;</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LEAGUES = {
+    mlb: {sport:'baseball', league:'mlb', label:'MLB', order:1, dailyCadence:true},
+    nba: {sport:'basketball', league:'nba', label:'NBA', order:2, dailyCadence:true},
+    nfl: {sport:'football', league:'nfl', label:'NFL', order:3, dailyCadence:false}, // weekly sport: keep ESPN's current-week default
+    nhl: {sport:'hockey', league:'nhl', label:'NHL', order:4, dailyCadence:true},
+    ncaaf: {sport:'football', league:'college-football', label:'NCAAF', order:5, dailyCadence:false, extraParams:'groups=80'}, // FBS only; weekly like NFL
+    // No single "major conferences" group exists for basketball, so fetch each power conference
+    // separately and merge: ACC=2, Big East=4, Big Ten=7, Big 12=8, SEC=23 (verified against ESPN's API).
+    ncaab: {sport:'basketball', league:'mens-college-basketball', label:'NCAAB', order:6, dailyCadence:true, groupsList:['2','4','7','8','23']}
+  };
+  var LEAGUE_ORDER = ['mlb','nba','nfl','nhl','ncaaf','ncaab'];
+
+  var state = {
+    filter: 'all',
+    view: 'ticker',
+    games: {},        // leagueKey -> array of normalized games (or null if failed to load)
+    lastUpdated: null,
+    prevScores: {},   // gameId -> {away, home} scores as of the previous load, for the score-change flash
+    favorites: loadFavorites() // Set of "league:teamId" strings pinned to the front of the ticker
+  };
+
+  // ---------- favorites ----------
+  function favKey(league, teamId){ return league + ':' + teamId; }
+  function isFavorite(league, teamId){ return !!teamId && state.favorites.has(favKey(league, teamId)); }
+  function gameHasFavorite(g){ return isFavorite(g.league, g.away.teamId) || isFavorite(g.league, g.home.teamId); }
+  function toggleFavorite(league, teamId){
+    var key = favKey(league, teamId);
+    if(state.favorites.has(key)) state.favorites.delete(key);
+    else state.favorites.add(key);
+    saveFavorites();
+    render();
+  }
+  function loadFavorites(){
+    try{
+      var raw = localStorage.getItem('scorewire_favorites');
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch(e){ return new Set(); }
+  }
+  function saveFavorites(){
+    try{ localStorage.setItem('scorewire_favorites', JSON.stringify(Array.from(state.favorites))); } catch(e){}
+  }
+
+  // ---------- fetching ----------
+  function fetchJSON(url){
+    return fetch(url, {cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    });
+  }
+
+  function fetchWithFallback(url){
+    return fetchJSON(url).catch(function(){
+      // Fallback through a public CORS relay if a direct browser fetch is ever blocked.
+      var proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+      return fetchJSON(proxied);
+    });
+  }
+
+  // Local calendar date as YYYYMMDD, recomputed on every call so a refresh
+  // that happens to fall right after local midnight picks up the new day.
+  function todayParam(){
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + m + day;
+  }
+
+  function scoreboardUrl(meta, groupOverride){
+    var url = 'https://site.api.espn.com/apis/site/v2/sports/' + meta.sport + '/' + meta.league + '/scoreboard';
+    var params = [];
+    if(meta.dailyCadence) params.push('dates=' + todayParam());
+    if(groupOverride) params.push('groups=' + groupOverride);
+    else if(meta.extraParams) params.push(meta.extraParams);
+    if(params.length) url += '?' + params.join('&');
+    return url;
+  }
+
+  function fetchLeague(key){
+    var meta = LEAGUES[key];
+
+    // Leagues like NCAAB have no single "major conferences" filter — fetch each conference's
+    // scoreboard separately and merge, deduping any game that shows up in more than one feed
+    // (e.g. an SEC team visiting a Big Ten team). Only report total failure if every conference
+    // request failed; a partial outage just means fewer games, not "unavailable".
+    if(meta.groupsList){
+      return Promise.all(meta.groupsList.map(function(gid){
+        return fetchWithFallback(scoreboardUrl(meta, gid))
+          .then(function(data){ return {ok:true, games: normalize(data, key)}; })
+          .catch(function(err){ console.error('Failed to load', key, 'group', gid, err); return {ok:false, games:[]}; });
+      })).then(function(results){
+        if(!results.some(function(r){ return r.ok; })) return null;
+        var seen = {}, merged = [];
+        results.forEach(function(r){
+          r.games.forEach(function(g){
+            if(!seen[g.id]){ seen[g.id] = true; merged.push(g); }
+          });
+        });
+        return merged;
+      });
+    }
+
+    return fetchWithFallback(scoreboardUrl(meta))
+      .then(function(data){ return normalize(data, key); })
+      .catch(function(err){
+        console.error('Failed to load', key, err);
+        return null; // signals "couldn't load" vs "loaded, zero games"
+      });
+  }
+
+  function normalize(data, key){
+    var events = (data && data.events) || [];
+    return events.map(function(ev){
+      var comp = ev.competitions && ev.competitions[0];
+      var competitors = (comp && comp.competitors) || [];
+      var home = competitors.find(function(c){return c.homeAway === 'home';}) || competitors[0];
+      var away = competitors.find(function(c){return c.homeAway === 'away';}) || competitors[1];
+      var status = (ev.status && ev.status.type) || {};
+      function side(c){
+        if(!c) return {abbr:'?', name:'?', score:'-', logo:'', teamId:'', winner:false};
+        var t = c.team || {};
+        return {
+          abbr: t.abbreviation || t.shortDisplayName || '?',
+          name: t.shortDisplayName || t.displayName || t.name || '?',
+          score: (c.score !== undefined && c.score !== null && c.score !== '') ? c.score : '-',
+          logo: t.logo || '',
+          color: t.color || '',
+          altColor: t.alternateColor || '',
+          teamId: String(t.id || c.id || ''),
+          winner: !!c.winner
+        };
+      }
+      var homeSide = side(home);
+      var awaySide = side(away);
+      var rawSit = comp && comp.situation;
+      var situation = null;
+      if(rawSit && key === 'mlb'){
+        situation = {
+          type: 'mlb',
+          balls: rawSit.balls || 0,
+          strikes: rawSit.strikes || 0,
+          outs: rawSit.outs || 0,
+          onFirst: !!rawSit.onFirst,
+          onSecond: !!rawSit.onSecond,
+          onThird: !!rawSit.onThird
+        };
+      } else if(rawSit && (key === 'nfl' || key === 'ncaaf')){
+        var possId = (rawSit.possession !== undefined && rawSit.possession !== null) ? String(rawSit.possession) : '';
+        var possessionSide = null;
+        if(possId && possId === awaySide.teamId) possessionSide = 'away';
+        else if(possId && possId === homeSide.teamId) possessionSide = 'home';
+        situation = {
+          type: 'nfl',
+          text: rawSit.shortDownDistanceText || rawSit.downDistanceText || '',
+          isRedZone: !!rawSit.isRedZone,
+          possessionSide: possessionSide
+        };
+      } else if(rawSit && key === 'nhl'){
+        // ESPN doesn't document a hockey "situation" schema the way it does MLB/football, so
+        // this checks every field name that's plausible for on-ice strength / power-play state.
+        // If the live payload actually uses a different key, this just finds nothing and the
+        // badge never shows -- a safe no-op rather than a broken feature.
+        var strengthRaw = rawSit.strength || rawSit.strengthText || rawSit.shortStrengthText || '';
+        var strengthStr = (strengthRaw && typeof strengthRaw === 'object')
+          ? (strengthRaw.text || strengthRaw.shortText || strengthRaw.name || strengthRaw.abbreviation || '')
+          : String(strengthRaw || '');
+        var isPP = rawSit.isPowerPlay === true || rawSit.powerPlay === true ||
+          rawSit.homeTeamPowerPlay === true || rawSit.awayTeamPowerPlay === true ||
+          /power\s*play|^pp$/i.test(strengthStr.trim());
+        var ppSide = null;
+        if(rawSit.homeTeamPowerPlay === true) ppSide = 'home';
+        else if(rawSit.awayTeamPowerPlay === true) ppSide = 'away';
+        if(!ppSide && rawSit.powerPlayTeam !== undefined && rawSit.powerPlayTeam !== null){
+          var ppId = String(rawSit.powerPlayTeam);
+          if(ppId === awaySide.teamId) ppSide = 'away';
+          else if(ppId === homeSide.teamId) ppSide = 'home';
+        }
+        if(isPP){
+          situation = {
+            type: 'nhl',
+            isPowerPlay: true,
+            ppSide: ppSide,
+            text: (strengthStr && !/^(pp|power\s*play)$/i.test(strengthStr.trim())) ? strengthStr : 'POWER PLAY'
+          };
+        }
+      }
+      return {
+        id: ev.id,
+        league: key,
+        state: status.state || 'pre',            // 'pre' | 'in' | 'post'
+        statusText: status.shortDetail || status.detail || '',
+        situation: situation,                     // MLB baserunners/count or NFL down-distance/possession, live games only
+        home: homeSide,
+        away: awaySide
+      };
+    });
+  }
+
+  function loadAll(){
+    var keys = Object.keys(LEAGUES);
+    return Promise.all(keys.map(fetchLeague)).then(function(results){
+      keys.forEach(function(k, i){ state.games[k] = results[i]; });
+      markScoreChanges();
+      state.lastUpdated = new Date();
+      render();
+    });
+  }
+
+  // Compares this load's scores against the previous load's, per game, so the ticker/scoreboard
+  // can flash just the number(s) that actually moved instead of re-flashing everything every refresh.
+  function markScoreChanges(){
+    var seen = {};
+    Object.keys(state.games).forEach(function(k){
+      var games = state.games[k];
+      if(!games) return;
+      games.forEach(function(g){
+        var prev = state.prevScores[g.id];
+        if(prev){
+          g.awayChanged = prev.away !== g.away.score;
+          g.homeChanged = prev.home !== g.home.score;
+        }
+        seen[g.id] = {away: g.away.score, home: g.home.score};
+      });
+    });
+    state.prevScores = seen;
+  }
+
+  // ---------- rendering ----------
+  function activeLeagues(){
+    return state.filter === 'all' ? LEAGUE_ORDER : [state.filter];
+  }
+
+  function render(){
+    renderScoreboard();
+    renderTicker();
+    renderLive();
+    renderTracked();
+    renderStatus();
+  }
+
+  function statusLabel(g){
+    if(g.state === 'in') return g.statusText || 'LIVE';
+    if(g.state === 'post') return 'FINAL';
+    return g.statusText || 'SCHEDULED';
+  }
+
+  function renderScoreboard(){
+    var root = document.getElementById('view-scoreboard');
+    var keys = activeLeagues();
+    var html = '';
+    keys.forEach(function(k){
+      var games = state.games[k];
+      html += '<div class="leagueGroup"><h2><span class="chip" style="background:var(--'+k+');color:var(--'+k+')"></span>' + LEAGUES[k].label + '</h2>';
+      if(games === null){
+        html += '<div class="empty">Couldn\'t load ' + LEAGUES[k].label + ' right now.</div>';
+      } else if(games === undefined){
+        html += '<div class="empty">Loading&hellip;</div>';
+      } else if(games.length === 0){
+        html += '<div class="empty">No games today.</div>';
+      } else {
+        html += '<div class="grid">';
+        games.forEach(function(g){ html += cardHTML(g); });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    root.innerHTML = html;
+  }
+
+  // A focused view of just what's currently in progress, across the leagues the header's league
+  // pills have selected (same filter Scoreboard respects) -- games that are scheduled or final
+  // are left out entirely rather than just visually de-emphasized.
+  function renderLive(){
+    var root = document.getElementById('view-live');
+    var keys = activeLeagues();
+    var any = false;
+    var anyLoaded = false;
+    var html = '';
+    keys.forEach(function(k){
+      var games = state.games[k];
+      if(games === undefined) return;
+      anyLoaded = true;
+      if(!games) return;
+      var live = games.filter(function(g){ return g.state === 'in'; });
+      if(!live.length) return;
+      any = true;
+      html += '<div class="leagueGroup"><h2><span class="chip" style="background:var(--'+k+');color:var(--'+k+')"></span>' + LEAGUES[k].label + '</h2><div class="grid">';
+      live.forEach(function(g){ html += cardHTML(g); });
+      html += '</div></div>';
+    });
+    if(!any){
+      html = '<div class="empty tracked-empty">' + (anyLoaded ? 'No games live right now.' : 'Loading&hellip;') + '</div>';
+    }
+    root.innerHTML = html;
+  }
+
+  // My Teams is a prominent, full-screen ticker -- the same visual weight as the main Ticker
+  // tab -- scoped to games involving a favorited team. It always covers every league regardless
+  // of the header's league pill filter, since the whole point is one place that gathers
+  // everything you've starred. There's no card grid here -- favoriting/unfavoriting stays
+  // centralized in the Scoreboard and Live tabs.
+  function renderTracked(){
+    var mainRail = document.getElementById('trackedTickerRail');
+    var mainBar = document.getElementById('trackedTickerBar');
+    var favGames = [];
+    var anyLoaded = false;
+    LEAGUE_ORDER.forEach(function(k){
+      var games = state.games[k];
+      if(games === undefined) return;
+      anyLoaded = true;
+      if(!games) return;
+      favGames = favGames.concat(games.filter(gameHasFavorite));
+    });
+
+    var message = '';
+    if(state.favorites.size === 0){
+      message = 'No teams tracked yet &mdash; head to Scoreboard or Live and tap a team to track it here.';
+    } else if(favGames.length === 0){
+      message = anyLoaded ? 'None of your tracked teams are in action right now.' : 'Loading&hellip;';
+    }
+
+    if(message){
+      mainRail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="st">' + message + '</span></div></div>';
+      mainRail.style.animation = 'none';
+      mainBar.classList.add('static');
+      return;
+    }
+
+    fillTickerRail(mainRail, mainBar, favGames.map(chipHTML), 5.4, 20);
+  }
+
+  function cardHTML(g){
+    var live = g.state === 'in';
+    var statusCls = live ? 'status live' : 'status';
+    var statusInner = live
+      ? '<span class="lv"><span class="dot"></span>' + statusLabel(g) + '</span>'
+      : '<span>' + statusLabel(g) + '</span>';
+    var pinned = gameHasFavorite(g);
+    return '' +
+      '<div class="card' + (pinned ? ' pinned' : '') + '" style="border-left-color:var(--' + g.league + ');box-shadow:-6px 0 16px -8px var(--' + g.league + ')">' +
+        '<div class="' + statusCls + '">' + statusInner + '<span>' + LEAGUES[g.league].label + '</span></div>' +
+        teamRow(g.away, g, g.awayChanged) +
+        teamRow(g.home, g, g.homeChanged) +
+      '</div>';
+  }
+
+  function teamRow(t, g, changed){
+    var done = g.state === 'post';
+    var nameCls = done ? (t.winner ? 'name winner' : 'name loser') : 'name';
+    var img = t.logo ? '<img src="' + t.logo + '" alt="" onerror="this.style.visibility=\'hidden\'">' : '';
+    var starBtn = favStarHTML(g.league, t.teamId, 'small');
+    var fav = isFavorite(g.league, t.teamId);
+    var rowCls = 'team-row' + (t.teamId ? ' clickable' : '') + (fav ? ' favorited' : '');
+    var dataAttrs = t.teamId ? ' data-league="' + g.league + '" data-team="' + t.teamId + '"' : '';
+    var flashCls = changed ? (gameHasFavorite(g) ? ' flash-fav' : ' flash') : '';
+    return '<div class="' + rowCls + '"' + dataAttrs + '><div class="who">' + starBtn + img + '<span class="' + nameCls + '">' + t.name + '</span></div><span class="score' + flashCls + '">' + t.score + '</span></div>';
+  }
+
+  function renderTicker(){
+    var rail = document.getElementById('tickerRail');
+    var keys = activeLeagues();
+    var games = [];
+    keys.forEach(function(k){
+      var list = state.games[k];
+      if(!list) return;
+      list.forEach(function(g){ games.push(g); });
+    });
+    // The main ticker stays in its natural league/schedule order -- favorited teams are not
+    // sorted to the front here (that reordering is reserved for the dedicated My Teams view).
+    fillTickerRail(rail, document.getElementById('tickerBar'), games.map(chipHTML), 5.4, 27);
+  }
+
+  // Shared by the main ticker and the My Teams mini ticker. The CSS loop (translateX -50%) needs
+  // the chip list duplicated back-to-back to look seamless -- but with only a couple of chips,
+  // both copies fit on screen at once and it just reads as "everything is listed twice" instead
+  // of scrolling. So: duplicate-and-scroll only once there's enough content to actually need it;
+  // otherwise show a single, centered, static copy.
+  var MIN_CHIPS_TO_SCROLL = 4;
+  function fillTickerRail(rail, container, chipsHtml, secondsPerChip, minSeconds){
+    if(chipsHtml.length === 0){
+      rail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="st">No games in view right now.</span></div></div>';
+      rail.style.animation = 'none';
+      container.classList.remove('static');
+      return;
+    }
+    if(chipsHtml.length < MIN_CHIPS_TO_SCROLL){
+      rail.innerHTML = chipsHtml.join('');
+      rail.style.animation = 'none';
+      container.classList.add('static');
+      return;
+    }
+    container.classList.remove('static');
+    rail.innerHTML = chipsHtml.join('') + chipsHtml.join('');
+    var seconds = Math.max(minSeconds, chipsHtml.length * secondsPerChip);
+    rail.style.animation = 'scroll ' + seconds + 's linear infinite';
+  }
+
+  var LEAGUE_FALLBACK_COLOR = {mlb:'#7a1fd6', nba:'#e0651f', nfl:'#2e6bff', nhl:'#16b3a3', ncaaf:'#b5342d', ncaab:'#d6006c'};
+
+  function normalizeHex(c){
+    if(!c) return '';
+    var h = c.charAt(0) === '#' ? c : ('#' + c);
+    return /^#[0-9a-f]{6}$/i.test(h) ? h : '';
+  }
+
+  function hexLuminance(hex){
+    var m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+    if(!m) return 255;
+    var r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+
+  // A team's real color is more accurate than a generic league accent even when it's dark —
+  // falling back to "the league's color" was how the Raiders (black/silver) ended up glowing
+  // NFL blue. Prefer the primary color; if it's too dark to read as a glow, use ESPN's
+  // alternate/secondary color instead (usually the team's silver/white/gold complement).
+  // Only fall back to the league accent if neither color exists at all.
+  var DARK_THRESHOLD = 40;
+  function teamColor(t, league){
+    var primary = normalizeHex(t && t.color);
+    var alt = normalizeHex(t && t.altColor);
+    if(primary && hexLuminance(primary) >= DARK_THRESHOLD) return primary;
+    if(alt && hexLuminance(alt) >= DARK_THRESHOLD) return alt;
+    return primary || alt || LEAGUE_FALLBACK_COLOR[league] || '#8993ab';
+  }
+
+  function tickerTeamHTML(t, league, iconHtml){
+    var color = teamColor(t, league);
+    var img = t.logo
+      ? '<img class="tlogo" style="--tc:' + color + '" src="' + t.logo + '" alt="" onerror="this.style.visibility=\'hidden\'">'
+      : '<div class="tlogo" style="--tc:' + color + '"></div>';
+    return '<div class="tteam">' + img + '<span class="tabbr">' + t.abbr + (iconHtml || '') + '</span></div>';
+  }
+
+  function starIcon(){
+    return '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.97 6.53 7.03.68-5.4 4.9 1.63 7.14L12 17.9l-6.23 3.85 1.63-7.14-5.4-4.9 7.03-.68z"/></svg>';
+  }
+
+  // A passive star indicator (not its own click target) -- the whole team-row it sits in
+  // is what's clickable now, so tapping the star, the logo, or the name all do the same thing.
+  function favStarHTML(league, teamId, sizeCls){
+    if(!teamId) return '';
+    var active = isFavorite(league, teamId);
+    var cls = 'favstar' + (sizeCls ? ' ' + sizeCls : '') + (active ? ' active' : '');
+    return '<span class="' + cls + '">' + starIcon() + '</span>';
+  }
+
+  function diamondSVG(sit){
+    var c = 'var(--gold)';
+    var off = 'rgba(255,255,255,.35)';
+    function fill(on){ return on ? c : 'none'; }
+    function stroke(on){ return on ? c : off; }
+    return '' +
+      '<svg class="tdiamond" viewBox="0 0 40 40">' +
+        '<path d="M20 4 L36 20 L20 36 L4 20 Z" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2"/>' +
+        '<circle cx="30" cy="20" r="4.5" fill="' + fill(sit.onFirst) + '" stroke="' + stroke(sit.onFirst) + '" stroke-width="2.5"/>' +
+        '<circle cx="20" cy="10" r="4.5" fill="' + fill(sit.onSecond) + '" stroke="' + stroke(sit.onSecond) + '" stroke-width="2.5"/>' +
+        '<circle cx="10" cy="20" r="4.5" fill="' + fill(sit.onThird) + '" stroke="' + stroke(sit.onThird) + '" stroke-width="2.5"/>' +
+      '</svg>';
+  }
+
+  function bsoText(sit){
+    return sit.balls + '-' + sit.strikes + ', ' + sit.outs + ' Out' + (sit.outs === 1 ? '' : 's');
+  }
+
+  function footballIcon(){
+    return '' +
+      '<svg class="tball" viewBox="0 0 28 16">' +
+        '<ellipse cx="14" cy="8" rx="13" ry="7.5" fill="var(--gold)" stroke="#3a2a00" stroke-width="1"/>' +
+        '<line x1="7" y1="8" x2="21" y2="8" stroke="#3a2a00" stroke-width="1.4"/>' +
+        '<line x1="11" y1="5.5" x2="11" y2="10.5" stroke="#3a2a00" stroke-width="1.2"/>' +
+        '<line x1="14" y1="5" x2="14" y2="11" stroke="#3a2a00" stroke-width="1.2"/>' +
+        '<line x1="17" y1="5.5" x2="17" y2="10.5" stroke="#3a2a00" stroke-width="1.2"/>' +
+      '</svg>';
+  }
+
+  function powerPlayIcon(){
+    return '' +
+      '<svg class="tball" viewBox="0 0 16 24">' +
+        '<polygon points="9,0 0,14 6,14 4,24 16,9 9,9" fill="var(--neon-cyan)" stroke="#003a40" stroke-width="1"/>' +
+      '</svg>';
+  }
+
+  function chipHTML(g){
+    var live = g.state === 'in';
+    var stInner = live ? '<span class="dot"></span>' + statusLabel(g) : statusLabel(g);
+    var stCls = live ? 'st live' : 'st';
+    var situationHTML = '';
+    var awayIcon = '', homeIcon = '';
+    if(g.league === 'mlb' && live && g.situation){
+      situationHTML = '<div class="tsit">' + diamondSVG(g.situation) + '<span class="bso">' + bsoText(g.situation) + '</span></div>';
+    } else if((g.league === 'nfl' || g.league === 'ncaaf') && live && g.situation && g.situation.text){
+      if(g.situation.possessionSide === 'away') awayIcon = footballIcon();
+      else if(g.situation.possessionSide === 'home') homeIcon = footballIcon();
+      var rzCls = g.situation.isRedZone ? ' redzone' : '';
+      situationHTML = '<div class="tsit' + rzCls + '">' + footballIcon() + '<span class="bso">' + g.situation.text + '</span></div>';
+    } else if(g.league === 'nhl' && live && g.situation && g.situation.isPowerPlay){
+      if(g.situation.ppSide === 'away') awayIcon = powerPlayIcon();
+      else if(g.situation.ppSide === 'home') homeIcon = powerPlayIcon();
+      situationHTML = '<div class="tsit powerplay">' + powerPlayIcon() + '<span class="bso">' + g.situation.text + '</span></div>';
+    }
+    var pinned = gameHasFavorite(g);
+    var awayFlashCls = g.awayChanged ? (pinned ? ' flash-fav' : ' flash') : '';
+    var homeFlashCls = g.homeChanged ? (pinned ? ' flash-fav' : ' flash') : '';
+    return '' +
+      '<div class="tchip' + (pinned ? ' pinned' : '') + '" data-l="' + g.league + '">' +
+        '<div class="tgame">' +
+          tickerTeamHTML(g.away, g.league, awayIcon) +
+          '<div class="tscore">' +
+            '<span class="s' + awayFlashCls + '">' + g.away.score + '</span>' +
+            '<span class="dash">&ndash;</span>' +
+            '<span class="s' + homeFlashCls + '">' + g.home.score + '</span>' +
+          '</div>' +
+          tickerTeamHTML(g.home, g.league, homeIcon) +
+        '</div>' +
+        '<div class="tmeta">' +
+          '<div class="tmline">' +
+            '<span class="lg">' + LEAGUES[g.league].label + '</span>' +
+            '<span class="' + stCls + '">' + stInner + '</span>' +
+          '</div>' +
+          situationHTML +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderStatus(){
+    var el = document.getElementById('status');
+    if(!state.lastUpdated){ el.textContent = 'Loading scores…'; return; }
+    var secs = Math.max(0, Math.round((Date.now() - state.lastUpdated.getTime())/1000));
+    var when = secs < 5 ? 'just now' : secs < 60 ? (secs + 's ago') : (Math.round(secs/60) + 'm ago');
+    var failed = Object.keys(state.games).filter(function(k){ return state.games[k] === null; });
+    var extra = failed.length ? ' — ' + failed.map(function(k){return LEAGUES[k].label;}).join('/') + ' unavailable' : '';
+    el.textContent = 'Updated ' + when + extra;
+  }
+
+  // ---------- controls ----------
+  document.getElementById('leaguePills').addEventListener('click', function(e){
+    var btn = e.target.closest('.pill');
+    if(!btn) return;
+    state.filter = btn.dataset.league;
+    document.querySelectorAll('.pill').forEach(function(p){ p.classList.toggle('active', p === btn); });
+    render();
+  });
+
+  document.querySelector('.viewToggle').addEventListener('click', function(e){
+    var btn = e.target.closest('button');
+    if(!btn) return;
+    state.view = btn.dataset.view;
+    document.querySelectorAll('.viewToggle button').forEach(function(b){ b.classList.toggle('active', b === btn); });
+    document.getElementById('view-scoreboard').classList.toggle('active', state.view === 'scoreboard');
+    document.getElementById('view-ticker').classList.toggle('active', state.view === 'ticker');
+    document.getElementById('view-live').classList.toggle('active', state.view === 'live');
+    document.getElementById('view-tracked').classList.toggle('active', state.view === 'tracked');
+  });
+  // set initial active view
+  document.getElementById('view-ticker').classList.add('active');
+
+  // Tapping anywhere on a team's row -- star, logo, or name -- toggles it as a favorite.
+  // Favoriting is only offered here in the Scoreboard/Live views; both tickers stay hands-off.
+  function handleTeamRowClick(e){
+    var row = e.target.closest('.team-row.clickable');
+    if(!row) return;
+    toggleFavorite(row.dataset.league, row.dataset.team);
+  }
+  document.getElementById('view-scoreboard').addEventListener('click', handleTeamRowClick);
+  document.getElementById('view-live').addEventListener('click', handleTeamRowClick);
+
+  document.getElementById('refreshBtn').addEventListener('click', function(){
+    refreshFlicker();
+    loadAll();
+  });
+
+  document.getElementById('fsBtn').addEventListener('click', function(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function(){});
+    } else {
+      document.exitFullscreen && document.exitFullscreen();
+    }
+  });
+
+  // ---------- clock ----------
+  function tickClock(){
+    var d = new Date();
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if(h === 0) h = 12;
+    document.getElementById('clock').textContent =
+      (h < 10 ? '0'+h : h) + ':' + (m < 10 ? '0'+m : m) + ' ' + ampm;
+    renderStatus();
+  }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  // ---------- CRT boot-up ----------
+  var BOOT_MIN_MS = 1000;
+  var bootStart = Date.now();
+  function hideBootOverlay(){
+    var wait = Math.max(0, BOOT_MIN_MS - (Date.now() - bootStart));
+    setTimeout(function(){
+      var el = document.getElementById('bootOverlay');
+      if(el) el.classList.add('hide');
+    }, wait);
+  }
+  function refreshFlicker(){
+    var app = document.getElementById('app');
+    app.classList.remove('refresh-flicker');
+    // eslint-disable-next-line no-unused-expressions
+    void app.offsetWidth; // restart the animation even if a previous flicker is still finishing
+    app.classList.add('refresh-flicker');
+    setTimeout(function(){ app.classList.remove('refresh-flicker'); }, 280);
+  }
+
+  // ---------- auto-refresh ----------
+  loadAll().then(hideBootOverlay);
+  setInterval(loadAll, 30000);
+
+  // ---------- ambient / kiosk auto-hide chrome ----------
+  var hideTimer = null;
+  function showChrome(){
+    document.getElementById('header').classList.remove('hidden');
+    document.getElementById('footer').classList.remove('hidden');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){
+      document.getElementById('header').classList.add('hidden');
+      document.getElementById('footer').classList.add('hidden');
+    }, 12000);
+  }
+  ['mousemove','touchstart','keydown','click'].forEach(function(evt){
+    document.addEventListener(evt, showChrome, {passive:true});
+  });
+  showChrome();
+
+})();
+</script>
+</body>
+</html>
