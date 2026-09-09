@@ -114,6 +114,25 @@
   .viewToggle button.active{background:var(--neon-cyan);color:#001217;box-shadow:0 0 16px -2px var(--neon-cyan) inset;}
   .viewToggle button .liveDot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:6px;box-shadow:0 0 6px var(--live);animation:pulse 1.4s infinite;}
 
+  /* ---------- RESPONSIVE HEADER (phones) ----------
+     Below this width the header used to just overflow sideways instead of wrapping as a
+     whole: the league pills would wrap internally into a tall stack of rows, which pushed
+     the view switcher and clock past the edge of the screen with no way to reach them, and
+     ate most of the vertical space that should have gone to the ticker. This reflows the
+     header into three bounded rows instead -- brand/clock/icons, the view switcher (full
+     width, evenly split), then the league pills as a single horizontally-scrollable row
+     rather than a many-row stack. */
+  @media (max-width: 700px){
+    header{flex-wrap:wrap;row-gap:8px;padding:10px 14px;}
+    .brand h1{font-size:19px;}
+    .clock{min-width:auto;font-size:14px;}
+    .viewToggle{order:5;flex:1 1 100%;}
+    .viewToggle button{flex:1;padding:8px 4px;font-size:9.5px;white-space:nowrap;}
+    .pills{order:6;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .pills::-webkit-scrollbar{display:none;}
+    .pill{flex-shrink:0;}
+  }
+
   /* ---------- MAIN ---------- */
   main{flex:1;overflow:hidden;position:relative;}
   .view{position:absolute;inset:0;overflow-y:auto;padding:22px;display:none;}
@@ -299,6 +318,26 @@
   .tsit.powerplay .bso{color:var(--neon-cyan);text-shadow:0 0 14px rgba(0,240,255,.7);animation:ppPulse 1s ease-in-out infinite;}
   @keyframes ppPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
   .tabbr .tball{width:26px;height:auto;flex-shrink:0;}
+
+  /* Scale ticker chip content to the ticker bar's OWN rendered height (cqh = 1% of the
+     container's block size) instead of the raw viewport. The vh-based sizing above is now
+     just a fallback for browsers without container query units -- on its own it was wrong
+     any time the header/footer chrome didn't take up the same share of the screen every
+     device assumed, e.g. a narrow phone where the league pills wrap to several rows: the
+     ticker's actual remaining height shrinks, but content kept sizing off 100% of the whole
+     screen and badly overflowed. container-type:size lets #tickerBar/#trackedTickerBar act
+     as that sizing context for their own descendants. */
+  #tickerBar, #trackedTickerBar{container-type:size;}
+  .tchip{gap:clamp(12px,2.8cqh,28px);padding:0 clamp(44px,8cqh,92px);}
+  .tgame{gap:clamp(28px,4.8cqh,52px);}
+  .tteam .tlogo{width:clamp(104px,26cqh,280px);height:clamp(104px,26cqh,280px);}
+  .tteam .tabbr{font-size:clamp(20px,3.1cqh,30px);}
+  .tscore{gap:clamp(16px,2.8cqh,32px);font-size:clamp(72px,20cqh,184px);}
+  .tmeta .lg{font-size:clamp(16px,2.4cqh,22px);}
+  .tmeta .st{font-size:clamp(18px,2.6cqh,26px);}
+  .tsit .tdiamond{width:clamp(40px,6cqh,60px);height:clamp(40px,6cqh,60px);}
+  .tsit .tball{width:clamp(36px,5.2cqh,52px);}
+  .tsit .bso{font-size:clamp(18px,2.8cqh,26px);}
 
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 
