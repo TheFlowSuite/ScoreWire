@@ -600,6 +600,10 @@
     return url;
   }
 
+  function summaryUrl(meta, eventId){
+    return 'https://site.api.espn.com/apis/site/v2/sports/' + meta.sport + '/' + meta.league + '/summary?event=' + eventId;
+  }
+
   function fetchLeague(key){
     var meta = LEAGUES[key];
 
@@ -737,6 +741,45 @@
     });
   }
 
+  var SITUATIONAL_LEAGUES = {mlb:true, nfl:true, ncaaf:true, nhl:true};
+
+  // The scoreboard feed's situation.lastPlay is only ever a snapshot of whatever happened
+  // most recently at the moment of the poll -- scoring plays constantly get missed if
+  // anything else happens (next batter, next play, inning change) before the next 30s poll
+  // rolls around. ESPN's per-game summary endpoint carries the full play-by-play instead
+  // (a `plays` array with a `scoringPlay`/`scoreValue` on each entry), so this fetches that
+  // separately -- only for games currently live in the four sports this applies to -- and
+  // backfills the authoritative last scoring play from there. Runs after the main score
+  // poll and never blocks it; triggers its own render() once the backfill is in.
+  function refreshLastScoringPlays(){
+    var live = [];
+    Object.keys(state.games).forEach(function(k){
+      if(!SITUATIONAL_LEAGUES[k]) return;
+      var games = state.games[k];
+      if(!games) return;
+      games.forEach(function(g){ if(g.state === 'in') live.push(g); });
+    });
+    if(!live.length) return;
+    Promise.all(live.map(function(g){
+      var meta = LEAGUES[g.league];
+      return fetchWithFallback(summaryUrl(meta, g.id))
+        .then(function(data){
+          var plays = data && data.plays;
+          if(!Array.isArray(plays)) return;
+          for(var i = plays.length - 1; i >= 0; i--){
+            var p = plays[i];
+            var scored = p.scoringPlay === true || (typeof p.scoreValue === 'number' && p.scoreValue > 0);
+            if(scored && p.text){
+              lastScoringPlayCache[g.id] = p.text;
+              g.lastScoringPlay = p.text;
+              break;
+            }
+          }
+        })
+        .catch(function(){ /* one game's summary failing shouldn't affect the rest */ });
+    })).then(render);
+  }
+
   function loadAll(){
     var keys = Object.keys(LEAGUES);
     return Promise.all(keys.map(fetchLeague)).then(function(results){
@@ -744,6 +787,7 @@
       markScoreChanges();
       state.lastUpdated = new Date();
       render();
+      refreshLastScoringPlays();
     });
   }
 
