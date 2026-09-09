@@ -230,6 +230,15 @@
   .card .tsit .tdiamond{width:clamp(22px, 7cqw, 34px);height:clamp(22px, 7cqw, 34px);}
   .card .tsit .tball{width:clamp(20px, 6.5cqw, 30px);}
   .card .tsit .bso{font-size:clamp(11px, 3.2cqw, 15px);}
+  /* "Last scoring play" -- MLB/NFL/NCAAF/NHL only (see captureLastScoringPlay); NBA/NCAAB
+     score too often for a single freeze-framed line to stay meaningful, so they never get
+     one. Small, muted, and truncated to one line so a long play description never stretches
+     or breaks the card's height -- this is a footnote, not a headline. */
+  .card .lastPlay{
+    margin-top:6px;font-size:clamp(10.5px, 2.6cqw, 12.5px);color:var(--text-dim);font-style:italic;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;
+  }
+  .card .lastPlay.bordered{margin-top:clamp(8px, 2.4cqw, 14px);padding-top:clamp(8px, 2.4cqw, 14px);border-top:1px solid var(--line);}
 
   .empty{color:var(--text-dim);font-size:14px;padding:8px 2px;}
   .tracked-empty{
@@ -623,6 +632,19 @@
       });
   }
 
+  // Remembers each game's most recent SCORING play (MLB/NFL/NCAAF/NHL only -- NBA/NCAAB
+  // score too fast for a "last scoring play" line to mean anything, so they never populate
+  // this). ESPN's scoreboard feed only ever hands us the single most recent play, scoring or
+  // not, so this cache is what turns "most recent play" into "most recent play that scored"
+  // and keeps it visible across polls until the next one replaces it.
+  var lastScoringPlayCache = {};
+  function captureLastScoringPlay(id, lastPlayRaw){
+    if(!lastPlayRaw || !lastPlayRaw.text) return;
+    var scored = lastPlayRaw.scoringPlay === true ||
+      (typeof lastPlayRaw.scoreValue === 'number' && lastPlayRaw.scoreValue > 0);
+    if(scored) lastScoringPlayCache[id] = lastPlayRaw.text;
+  }
+
   function normalize(data, key){
     var events = (data && data.events) || [];
     return events.map(function(ev){
@@ -659,6 +681,7 @@
           onSecond: !!rawSit.onSecond,
           onThird: !!rawSit.onThird
         };
+        captureLastScoringPlay(ev.id, rawSit.lastPlay);
       } else if(rawSit && (key === 'nfl' || key === 'ncaaf')){
         var possId = (rawSit.possession !== undefined && rawSit.possession !== null) ? String(rawSit.possession) : '';
         var possessionSide = null;
@@ -670,6 +693,7 @@
           isRedZone: !!rawSit.isRedZone,
           possessionSide: possessionSide
         };
+        captureLastScoringPlay(ev.id, rawSit.lastPlay);
       } else if(rawSit && key === 'nhl'){
         // ESPN doesn't document a hockey "situation" schema the way it does MLB/football, so
         // this checks every field name that's plausible for on-ice strength / power-play state.
@@ -698,6 +722,7 @@
             text: (strengthStr && !/^(pp|power\s*play)$/i.test(strengthStr.trim())) ? strengthStr : 'POWER PLAY'
           };
         }
+        captureLastScoringPlay(ev.id, rawSit.lastPlay);
       }
       return {
         id: ev.id,
@@ -705,6 +730,7 @@
         state: status.state || 'pre',            // 'pre' | 'in' | 'post'
         statusText: status.shortDetail || status.detail || '',
         situation: situation,                     // MLB baserunners/count or NFL down-distance/possession, live games only
+        lastScoringPlay: lastScoringPlayCache[ev.id] || null,  // mlb/nfl/ncaaf/nhl only -- see captureLastScoringPlay
         home: homeSide,
         away: awaySide
       };
@@ -851,12 +877,21 @@
       ? '<span class="lv"><span class="dot"></span>' + statusLabel(g) + '</span>'
       : '<span>' + statusLabel(g) + '</span>';
     var pinned = gameHasFavorite(g);
+    var sitHTML = situationRowHTML(g);
+    var lastPlayHTML = '';
+    if(g.lastScoringPlay){
+      // If the situational row already drew a top border to separate itself from the team
+      // rows, this just continues below it -- otherwise (no situational row, e.g. the game
+      // has since gone final) it needs its own border to still read as a separate line.
+      lastPlayHTML = '<div class="lastPlay' + (sitHTML ? '' : ' bordered') + '">' + g.lastScoringPlay + '</div>';
+    }
     return '' +
       '<div class="card' + (pinned ? ' pinned' : '') + '" style="border-left-color:var(--' + g.league + ');box-shadow:-6px 0 16px -8px var(--' + g.league + ')">' +
         '<div class="' + statusCls + '">' + statusInner + '<span>' + LEAGUES[g.league].label + '</span></div>' +
         teamRow(g.away, g, g.awayChanged) +
         teamRow(g.home, g, g.homeChanged) +
-        situationRowHTML(g) +
+        sitHTML +
+        lastPlayHTML +
       '</div>';
   }
 
