@@ -218,6 +218,19 @@
   .team-row{padding:clamp(4px, 1.2cqw, 8px) clamp(6px, 1.6cqw, 10px);}
   .card{padding:clamp(14px, 4cqw, 22px) clamp(16px, 4.6cqw, 26px);}
 
+  /* In-game situational detail (.tsit/.tdiamond/.tball/.bso) is defined further down for the
+     ticker, sized off the ticker bar's own cqh/vh -- neither unit means anything sensible
+     inside a card, so it'd just fall back to viewport-height sizing and could easily dwarf
+     the card's own tiny team logos. Cards already scale off their own width (cqw, see above),
+     so give the situational row card-appropriate sizing in that same unit instead. */
+  .card .tsit{
+    justify-content:center;margin-top:clamp(8px, 2.4cqw, 14px);padding-top:clamp(8px, 2.4cqw, 14px);
+    border-top:1px solid var(--line);
+  }
+  .card .tsit .tdiamond{width:clamp(22px, 7cqw, 34px);height:clamp(22px, 7cqw, 34px);}
+  .card .tsit .tball{width:clamp(20px, 6.5cqw, 30px);}
+  .card .tsit .bso{font-size:clamp(11px, 3.2cqw, 15px);}
+
   .empty{color:var(--text-dim);font-size:14px;padding:8px 2px;}
   .tracked-empty{
     display:flex;align-items:center;justify-content:center;text-align:center;
@@ -843,6 +856,7 @@
         '<div class="' + statusCls + '">' + statusInner + '<span>' + LEAGUES[g.league].label + '</span></div>' +
         teamRow(g.away, g, g.awayChanged) +
         teamRow(g.home, g, g.homeChanged) +
+        situationRowHTML(g) +
       '</div>';
   }
 
@@ -983,23 +997,35 @@
       '</svg>';
   }
 
+  // Shared by both the ticker chip and the scoreboard/live card -- whatever in-game detail
+  // is available for the sport currently showing: MLB baserunner diamond + count, NFL/NCAAF
+  // down-and-distance (with a red zone glow), NHL power play. Empty string when there's
+  // nothing live to show (pregame, final, or a league with no situational feed).
+  function situationRowHTML(g){
+    var live = g.state === 'in';
+    if(g.league === 'mlb' && live && g.situation){
+      return '<div class="tsit">' + diamondSVG(g.situation) + '<span class="bso">' + bsoText(g.situation) + '</span></div>';
+    } else if((g.league === 'nfl' || g.league === 'ncaaf') && live && g.situation && g.situation.text){
+      var rzCls = g.situation.isRedZone ? ' redzone' : '';
+      return '<div class="tsit' + rzCls + '">' + footballIcon() + '<span class="bso">' + g.situation.text + '</span></div>';
+    } else if(g.league === 'nhl' && live && g.situation && g.situation.isPowerPlay){
+      return '<div class="tsit powerplay">' + powerPlayIcon() + '<span class="bso">' + g.situation.text + '</span></div>';
+    }
+    return '';
+  }
+
   function chipHTML(g){
     var live = g.state === 'in';
     var stInner = live ? '<span class="dot"></span>' + statusLabel(g) : statusLabel(g);
     var stCls = live ? 'st live' : 'st';
-    var situationHTML = '';
+    var situationHTML = situationRowHTML(g);
     var awayIcon = '', homeIcon = '';
-    if(g.league === 'mlb' && live && g.situation){
-      situationHTML = '<div class="tsit">' + diamondSVG(g.situation) + '<span class="bso">' + bsoText(g.situation) + '</span></div>';
-    } else if((g.league === 'nfl' || g.league === 'ncaaf') && live && g.situation && g.situation.text){
+    if((g.league === 'nfl' || g.league === 'ncaaf') && live && g.situation && g.situation.text){
       if(g.situation.possessionSide === 'away') awayIcon = footballIcon();
       else if(g.situation.possessionSide === 'home') homeIcon = footballIcon();
-      var rzCls = g.situation.isRedZone ? ' redzone' : '';
-      situationHTML = '<div class="tsit' + rzCls + '">' + footballIcon() + '<span class="bso">' + g.situation.text + '</span></div>';
     } else if(g.league === 'nhl' && live && g.situation && g.situation.isPowerPlay){
       if(g.situation.ppSide === 'away') awayIcon = powerPlayIcon();
       else if(g.situation.ppSide === 'home') homeIcon = powerPlayIcon();
-      situationHTML = '<div class="tsit powerplay">' + powerPlayIcon() + '<span class="bso">' + g.situation.text + '</span></div>';
     }
     var pinned = gameHasFavorite(g);
     var awayFlashCls = g.awayChanged ? (pinned ? ' flash-fav' : ' flash') : '';
