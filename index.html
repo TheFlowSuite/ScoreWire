@@ -406,17 +406,34 @@
      status text) still just uses cqh, since it was never what was overflowing. container-
      type:size lets #tickerBar/#trackedTickerBar act as that sizing context for their own
      descendants. */
+  /* The cqw budgets below are deliberately tight -- tight enough that on basically any
+     landscape width (iPad or otherwise), cqw is the term that actually wins the min(), not
+     cqh. That matters because cqh is NOT stable: the ticker bar sits in a flex column below a
+     header/footer that this app auto-hides after 12s of inactivity (see "ambient/kiosk
+     auto-hide chrome" below), and the header/footer collapsing to near-zero height hands that
+     freed space straight to the ticker bar -- cqh can climb a great deal between "just
+     interacted with" and "idle for a few seconds," entirely independent of anything actually
+     being wrong. On a real iPad that growth was enough to push logos/scores close to their
+     old ceilings (320px logos, 212px score text) -- fine proportions on an actual TV, but on
+     an iPad-width screen a couple of chips at that size are each wider than the whole display,
+     so only a sliver of one chip is ever on screen at once with huge black gaps on either side
+     of it -- which is exactly what looked like the ticker "going black." Pinning the
+     width-contributing properties to a tight cqw budget keeps chip size -- and therefore how
+     many chips are visible at once -- essentially constant regardless of whether the chrome is
+     shown or auto-hidden, since cqw only depends on the bar's WIDTH, which auto-hide never
+     touches. (Ceilings are still set high enough to grow further on a genuinely huge display,
+     e.g. an actual TV, just nowhere near as far as before.) */
   #tickerBar, #trackedTickerBar{container-type:size;}
-  .tchip{gap:clamp(12px,2.8cqh,28px);padding:0 clamp(16px,min(8cqh,6.4cqw),92px);}
-  .tgame{gap:clamp(10px,min(4.8cqh,3.84cqw),52px);}
-  .tteam .tlogo{width:clamp(44px,min(30cqh,24cqw),320px);height:clamp(44px,min(30cqh,24cqw),320px);}
-  .tteam .tabbr{font-size:clamp(12px,min(3.1cqh,2.5cqw),30px);}
-  .tscore{gap:clamp(6px,min(2.8cqh,2.25cqw),32px);font-size:clamp(32px,min(23cqh,13.8cqw),212px);}
+  .tchip{gap:clamp(12px,2.8cqh,28px);padding:0 clamp(16px,min(8cqh,3.35cqw),60px);}
+  .tgame{gap:clamp(10px,min(4.8cqh,2cqw),34px);}
+  .tteam .tlogo{width:clamp(44px,min(30cqh,12cqw),200px);height:clamp(44px,min(30cqh,12cqw),200px);}
+  .tteam .tabbr{font-size:clamp(12px,min(3.1cqh,1.5cqw),24px);}
+  .tscore{gap:clamp(6px,min(2.8cqh,1.3cqw),22px);font-size:clamp(32px,min(23cqh,8cqw),130px);}
   .tmeta .lg{font-size:clamp(11px,2.4cqh,22px);}
   .tmeta .st{font-size:clamp(12px,2.6cqh,26px);}
-  .tsit .tdiamond{width:clamp(18px,min(6cqh,4.8cqw),60px);height:clamp(18px,min(6cqh,4.8cqw),60px);}
-  .tsit .tball{width:clamp(16px,min(5.2cqh,4.16cqw),52px);}
-  .tsit .bso{font-size:clamp(11px,min(2.8cqh,2.25cqw),26px);}
+  .tsit .tdiamond{width:clamp(18px,min(6cqh,2.4cqw),40px);height:clamp(18px,min(6cqh,2.4cqw),40px);}
+  .tsit .tball{width:clamp(16px,min(5.2cqh,2.1cqw),34px);}
+  .tsit .bso{font-size:clamp(11px,min(2.8cqh,1.2cqw),18px);}
 
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 
