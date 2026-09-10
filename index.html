@@ -978,6 +978,19 @@
     return g.statusText || 'SCHEDULED';
   }
 
+  // Scoreboard and Live both fully rebuild their view's innerHTML on every render (a poll, a
+  // league-filter change, or -- what actually prompted this -- tapping a team's star to
+  // favorite it), which resets the view's own scroll position back to 0 as a side effect on
+  // every browser tested, mobile Safari/iPadOS included. Since these are the two views someone
+  // is actually scrolled through a long list on when they tap a star, that reset reads as the
+  // whole page yanking back to the top the instant you favorite a team. Saving and restoring
+  // the view's scrollTop around the rebuild keeps you exactly where you were.
+  function setViewHTML(root, html){
+    var scrollTop = root.scrollTop;
+    root.innerHTML = html;
+    root.scrollTop = scrollTop;
+  }
+
   function renderScoreboard(){
     var root = document.getElementById('view-scoreboard');
     var keys = activeLeagues();
@@ -998,7 +1011,7 @@
       }
       html += '</div>';
     });
-    root.innerHTML = html;
+    setViewHTML(root, html);
   }
 
   // A focused view of just what's currently in progress, across the leagues the header's league
@@ -1025,7 +1038,7 @@
     if(!any){
       html = '<div class="empty tracked-empty">' + (anyLoaded ? 'No games live right now.' : 'Loading&hellip;') + '</div>';
     }
-    root.innerHTML = html;
+    setViewHTML(root, html);
   }
 
   // My Teams is a prominent, full-screen ticker -- the same visual weight as the main Ticker
