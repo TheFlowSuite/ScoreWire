@@ -488,6 +488,12 @@
     box-shadow:0 0 24px -2px var(--live-glow), 0 2px 30px -6px rgba(0,0,0,.8);
     animation:offlinePulse 1.6s ease-in-out infinite;
   }
+  /* The plain `display:flex` above is an author-stylesheet rule, and author rules always beat
+     the user-agent stylesheet's default `[hidden]{display:none}` regardless of specificity --
+     so without this override, setting el.hidden = true in JS still left the banner visible.
+     This is the actual fix for that: an author-stylesheet rule of our own, scoped to
+     [hidden], that wins the tie within our own stylesheet. */
+  .offline-banner[hidden]{display:none;}
   .offline-banner .when{
     font-family:'Inter',system-ui,sans-serif;font-weight:400;font-size:12px;letter-spacing:.3px;
     color:#ffd6d6;text-transform:none;
@@ -912,6 +918,18 @@
     return state.filter === 'all' ? LEAGUE_ORDER : [state.filter];
   }
 
+  // Pushes finished games to the end of a list so whatever's still worth watching -- live or
+  // upcoming -- leads the ticker/scoreboard, instead of a final sitting wherever its original
+  // kickoff time happened to fall (which, for a weekly sport like NFL/NCAAF, often means it's
+  // still up front days after it ended). Array#sort is a stable sort (guaranteed since
+  // ES2019), so games keep their original relative order within each group -- this only moves
+  // the finals block, it doesn't otherwise reshuffle anything.
+  function sortCompletedLast(games){
+    return games.slice().sort(function(a, b){
+      return (a.state === 'post' ? 1 : 0) - (b.state === 'post' ? 1 : 0);
+    });
+  }
+
   function render(){
     renderScoreboard();
     renderTicker();
@@ -941,7 +959,7 @@
         html += '<div class="empty">No games today.</div>';
       } else {
         html += '<div class="grid">';
-        games.forEach(function(g){ html += cardHTML(g); });
+        sortCompletedLast(games).forEach(function(g){ html += cardHTML(g); });
         html += '</div>';
       }
       html += '</div>';
@@ -991,7 +1009,7 @@
       if(games === undefined) return;
       anyLoaded = true;
       if(!games) return;
-      favGames = favGames.concat(games.filter(gameHasFavorite));
+      favGames = favGames.concat(sortCompletedLast(games.filter(gameHasFavorite)));
     });
 
     var message = '';
@@ -1076,10 +1094,12 @@
     keys.forEach(function(k){
       var list = state.games[k];
       if(!list) return;
-      list.forEach(function(g){ games.push(g); });
+      games = games.concat(sortCompletedLast(list));
     });
     // The main ticker stays in its natural league/schedule order -- favorited teams are not
     // sorted to the front here (that reordering is reserved for the dedicated My Teams view).
+    // Within each league, finals are pushed to the end (see sortCompletedLast) so live/upcoming
+    // games lead and a completed game doesn't linger up front for the rest of the week.
     fillTickerRail(rail, document.getElementById('tickerBar'), games.map(chipHTML), 5.4, 27);
   }
 
