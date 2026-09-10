@@ -254,6 +254,12 @@
   #trackedTickerBar{
     flex:1;min-height:0;position:relative;overflow:hidden;
     display:flex;align-items:center;
+    /* Promotes this to its own dedicated GPU compositing layer instead of leaving WebKit to
+       decide -- see the long comment above #tickerBar .rail for why: a fixed-position patch of
+       this bar going black on a long-running kiosk display is the signature of a browser tile
+       simply not getting repainted, and a stable, explicitly-owned layer is less likely to be
+       the one WebKit evicts/forgets to refresh under memory pressure over hours of runtime. */
+    transform:translateZ(0);will-change:transform;
     /* identical recipe to #tickerBar (the main ticker), so the two backgrounds match exactly */
     background:
       linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,.7) 55%, rgba(0,0,0,.4) 100%),
@@ -268,6 +274,7 @@
   #tickerBar{
     position:absolute;left:0;right:0;bottom:0;height:100%;
     display:flex;align-items:center;overflow:hidden;
+    transform:translateZ(0);will-change:transform;
     background:
       linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,.7) 55%, rgba(0,0,0,.4) 100%),
       repeating-linear-gradient(90deg, rgba(0,240,255,.07) 0px, rgba(0,240,255,.07) 1px, transparent 1px, transparent 64px),
@@ -962,7 +969,7 @@
       return;
     }
 
-    fillTickerRail(mainRail, mainBar, favGames.map(chipHTML), 5.4, 20);
+    fillTickerRail(mainRail, mainBar, favGames.map(chipHTML), 5.4, 20, 3);
   }
 
   // Cuts play text down to a compact, glanceable snippet instead of trusting card width
@@ -1041,16 +1048,19 @@
   // the chip list duplicated back-to-back to look seamless -- but with only a couple of chips,
   // both copies fit on screen at once and it just reads as "everything is listed twice" instead
   // of scrolling. So: duplicate-and-scroll only once there's enough content to actually need it;
-  // otherwise show a single, centered, static copy.
+  // otherwise show a single, centered, static copy. The main ticker (lots of unrelated games,
+  // rarely just a couple at once) and My Teams (as few as one tracked team's game) want
+  // different thresholds for that, so it's a parameter rather than one shared constant.
   var MIN_CHIPS_TO_SCROLL = 4;
-  function fillTickerRail(rail, container, chipsHtml, secondsPerChip, minSeconds){
+  function fillTickerRail(rail, container, chipsHtml, secondsPerChip, minSeconds, minChipsToScroll){
+    var threshold = minChipsToScroll || MIN_CHIPS_TO_SCROLL;
     if(chipsHtml.length === 0){
       rail.innerHTML = '<div class="tchip"><div class="tmeta"><span class="tmsg">No games in view right now.</span></div></div>';
       rail.style.animation = 'none';
       container.classList.remove('static');
       return;
     }
-    if(chipsHtml.length < MIN_CHIPS_TO_SCROLL){
+    if(chipsHtml.length < threshold){
       rail.innerHTML = chipsHtml.join('');
       rail.style.animation = 'none';
       container.classList.add('static');
@@ -1305,6 +1315,29 @@
   }
   document.addEventListener('fullscreenchange', handleFullscreenChange);
   document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+  // ---------- periodic repaint nudge (defends against a stuck browser tile) ----------
+  // A patch of the ticker that goes black in a FIXED screen position (not moving with the
+  // scrolling content) and eventually corrects itself on its own is the signature of a browser
+  // tile that simply stopped getting repainted -- a known category of WebKit behavior on
+  // pages that run for hours without a real navigation, more likely to bite the specific
+  // region that changes least (the ticker bar's own background/edges rather than the
+  // constantly-updating scroll content passing through it). restartTickerAnimation() above
+  // already forces a clean redraw, but it resets the scroll position back to 0%, which would
+  // itself be a visible, jarring skip if done on a timer -- fine right after a deliberate
+  // fullscreen transition, not fine to do silently every minute on a kiosk display. This nudges
+  // just the bar's own compositing layer (an imperceptible opacity flicker, immediately
+  // reverted) instead: enough to make the browser recomposite/repaint that layer, without
+  // touching the rail's own transform animation or the scroll position at all.
+  function nudgeTickerRepaint(){
+    ['tickerBar', 'trackedTickerBar'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.style.opacity = '0.999';
+      requestAnimationFrame(function(){ el.style.opacity = ''; });
+    });
+  }
+  setInterval(nudgeTickerRepaint, 45000);
 
   // ---------- keep the screen awake ----------
   // A kiosk display that goes to sleep after the phone/tablet's normal idle timeout defeats
