@@ -1248,6 +1248,33 @@
     // else: already launched from the home screen icon, already chrome-free -- nothing to do.
   });
 
+  // Entering/exiting true fullscreen (the button above) changes the viewport iPadOS actually
+  // reports to the page -- and with it, the ticker bar's own rendered width/height, which all
+  // of its cqh/cqw-based sizing (and the CSS scroll animation's -50% translate, which is
+  // relative to the rail's own painted width) depends on. iPadOS Safari has been seen leaving
+  // the ticker's scrolling rail with stale, incorrectly-clipped content right after that
+  // transition -- a game that should still be scrolling through instead sitting hard-cut and
+  // frozen -- rather than cleanly recomputing. Rebuilding the rail's markup fresh and
+  // explicitly restarting its animation once the transition settles clears that out.
+  function restartTickerAnimation(){
+    ['tickerRail', 'trackedTickerRail'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      var anim = el.style.animation;
+      if(!anim || anim === 'none') return;
+      el.style.animation = 'none';
+      void el.offsetWidth; // force a reflow so the browser actually drops the old animation state
+      el.style.animation = anim;
+    });
+  }
+  function handleFullscreenChange(){
+    // The transition itself can take a beat to settle on iPadOS -- wait a moment so render()
+    // picks up the final, stable viewport rather than an in-between size.
+    setTimeout(function(){ render(); restartTickerAnimation(); }, 150);
+  }
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
   // ---------- keep the screen awake ----------
   // A kiosk display that goes to sleep after the phone/tablet's normal idle timeout defeats
   // the whole point. The Screen Wake Lock API tells the OS to hold the screen on while this
