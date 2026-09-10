@@ -734,6 +734,14 @@
       var rawSit = comp && comp.situation;
       var situation = null;
       if(rawSit && key === 'mlb'){
+        // ESPN's live "situation" object doesn't carry an explicit top/bottom-of-inning flag
+        // the way it carries an explicit possession team ID for football -- but the status
+        // text this app already displays verbatim (e.g. "Bot 4th") is ESPN's own reliable,
+        // consistently-formatted signal for it, so parsing that is more robust than guessing
+        // at an undocumented field name. Between half-innings ("Mid"/"End 4th") nobody is
+        // actually at the plate, so battingSide is correctly left null rather than guessed.
+        var half = (status.shortDetail || status.detail || '');
+        var battingSide = /^top\b/i.test(half) ? 'away' : /^bot/i.test(half) ? 'home' : null;
         situation = {
           type: 'mlb',
           balls: rawSit.balls || 0,
@@ -741,7 +749,8 @@
           outs: rawSit.outs || 0,
           onFirst: !!rawSit.onFirst,
           onSecond: !!rawSit.onSecond,
-          onThird: !!rawSit.onThird
+          onThird: !!rawSit.onThird,
+          battingSide: battingSide
         };
         captureLastScoringPlay(ev.id, rawSit.lastPlay);
       } else if(rawSit && (key === 'nfl' || key === 'ncaaf')){
@@ -1159,6 +1168,15 @@
       '</svg>';
   }
 
+  function baseballIcon(){
+    return '' +
+      '<svg class="tball" viewBox="0 0 24 24">' +
+        '<circle cx="12" cy="12" r="10.5" fill="#fff" stroke="#3a2a00" stroke-width="1"/>' +
+        '<path d="M4.5 6.5 C8 9.5 8 14.5 4.5 17.5" fill="none" stroke="var(--neon-pink)" stroke-width="1.4"/>' +
+        '<path d="M19.5 6.5 C16 9.5 16 14.5 19.5 17.5" fill="none" stroke="var(--neon-pink)" stroke-width="1.4"/>' +
+      '</svg>';
+  }
+
   // Shared by both the ticker chip and the scoreboard/live card -- whatever in-game detail
   // is available for the sport currently showing: MLB baserunner diamond + count, NFL/NCAAF
   // down-and-distance (with a red zone glow), NHL power play. Empty string when there's
@@ -1182,7 +1200,10 @@
     var stCls = live ? 'st live' : 'st';
     var situationHTML = situationRowHTML(g);
     var awayIcon = '', homeIcon = '';
-    if((g.league === 'nfl' || g.league === 'ncaaf') && live && g.situation && g.situation.text){
+    if(g.league === 'mlb' && live && g.situation && g.situation.battingSide){
+      if(g.situation.battingSide === 'away') awayIcon = baseballIcon();
+      else if(g.situation.battingSide === 'home') homeIcon = baseballIcon();
+    } else if((g.league === 'nfl' || g.league === 'ncaaf') && live && g.situation && g.situation.text){
       if(g.situation.possessionSide === 'away') awayIcon = footballIcon();
       else if(g.situation.possessionSide === 'home') homeIcon = footballIcon();
     } else if(g.league === 'nhl' && live && g.situation && g.situation.isPowerPlay){
