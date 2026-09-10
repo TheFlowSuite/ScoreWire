@@ -469,6 +469,34 @@
   footer > *{transition:opacity .5s ease;}
   #status{white-space:nowrap;color:var(--neon-cyan);}
 
+  /* ---------- offline banner ----------
+     Shown only when EVERY league has failed to fetch (a total ESPN/network outage), as
+     opposed to the small "<league> unavailable" text appended in the footer status line for
+     a partial/single-league failure. Deliberately independent of the header/footer auto-hide
+     chrome: this is a kiosk display that often sits idle and un-tapped for hours, and that's
+     exactly when an outage is most likely to go unnoticed -- so it stays visible, bright, and
+     centered across the top of the screen even while the rest of the chrome is hidden. Purely
+     visual, no audio, by design. */
+  .offline-banner{
+    flex-shrink:0;position:relative;z-index:11;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    padding:8px 16px;text-align:center;
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:14px;letter-spacing:1.5px;
+    text-transform:uppercase;color:#fff;
+    background:linear-gradient(180deg, rgba(120,0,0,.92), rgba(60,0,0,.85));
+    border-bottom:1px solid var(--live);
+    box-shadow:0 0 24px -2px var(--live-glow), 0 2px 30px -6px rgba(0,0,0,.8);
+    animation:offlinePulse 1.6s ease-in-out infinite;
+  }
+  .offline-banner .when{
+    font-family:'Inter',system-ui,sans-serif;font-weight:400;font-size:12px;letter-spacing:.3px;
+    color:#ffd6d6;text-transform:none;
+  }
+  @keyframes offlinePulse{
+    0%,100%{box-shadow:0 0 24px -2px var(--live-glow), 0 2px 30px -6px rgba(0,0,0,.8);}
+    50%{box-shadow:0 0 40px 4px var(--live-glow), 0 2px 30px -6px rgba(0,0,0,.8);}
+  }
+
   /* ---------- fullscreen fallback tip ----------
      iPhone Safari never implemented the Fullscreen API (Element.requestFullscreen), only
      iPadOS did -- so tapping the button there silently does nothing. This surfaces the real
@@ -530,6 +558,8 @@
 </head>
 <body>
 <div id="app">
+  <div id="offlineBanner" class="offline-banner" hidden>&#9888; CONNECTION LOST &mdash; retrying&hellip; <span class="when" id="offlineWhen"></span></div>
+
   <header id="header">
     <div class="brand"><span class="dot"></span><h1>Score<span>Wire</span></h1></div>
     <div class="pills" id="leaguePills">
@@ -1236,12 +1266,24 @@
 
   function renderStatus(){
     var el = document.getElementById('status');
-    if(!state.lastUpdated){ el.textContent = 'Loading scores…'; return; }
+    var banner = document.getElementById('offlineBanner');
+    if(!state.lastUpdated){ el.textContent = 'Loading scores…'; banner.hidden = true; return; }
     var secs = Math.max(0, Math.round((Date.now() - state.lastUpdated.getTime())/1000));
     var when = secs < 5 ? 'just now' : secs < 60 ? (secs + 's ago') : (Math.round(secs/60) + 'm ago');
-    var failed = Object.keys(state.games).filter(function(k){ return state.games[k] === null; });
+    var keys = Object.keys(state.games);
+    var failed = keys.filter(function(k){ return state.games[k] === null; });
     var extra = failed.length ? ' — ' + failed.map(function(k){return LEAGUES[k].label;}).join('/') + ' unavailable' : '';
     el.textContent = 'Updated ' + when + extra;
+
+    // Total outage -- every league failed to fetch -- gets its own prominent, always-on-top
+    // banner (see .offline-banner CSS) instead of relying on this small footer text, since the
+    // footer fades away with the rest of the kiosk chrome during idle auto-hide.
+    var totalOutage = keys.length > 0 && failed.length === keys.length;
+    banner.hidden = !totalOutage;
+    if(totalOutage){
+      document.getElementById('offlineWhen').textContent =
+        '(scores last updated ' + when + ')';
+    }
   }
 
   // ---------- controls ----------
@@ -1394,9 +1436,29 @@
     document.getElementById('clock').textContent =
       (h < 10 ? '0'+h : h) + ':' + (m < 10 ? '0'+m : m) + ' ' + ampm;
     renderStatus();
+    maybeDailyReload(d);
   }
   setInterval(tickClock, 1000);
   tickClock();
+
+  // ---------- daily maintenance reload ----------
+  // A kiosk tab left running 24/7 for days/weeks at a time can accumulate browser-level drift
+  // -- memory growth, long-running rendering-engine quirks like the repaint issue mitigated
+  // above, etc. As cheap insurance against that, do one full page reload during a quiet
+  // overnight window when nobody's likely watching, at most once per calendar day. Piggybacks
+  // on the existing once-a-second clock tick rather than a second timer; the once-per-day
+  // guard is date-stamped in localStorage so it survives even if a reload happens to land a
+  // few seconds late (a throttled background tab, etc).
+  function maybeDailyReload(d){
+    var h = d.getHours(), m = d.getMinutes();
+    if(h !== 4 || m >= 5) return; // 4:00-4:04am local window
+    var today = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    try{
+      if(localStorage.getItem('scorewire_last_reload') === today) return;
+      localStorage.setItem('scorewire_last_reload', today);
+    }catch(e){ return; } // no localStorage -- skip rather than reload-loop every second
+    location.reload();
+  }
 
   // ---------- CRT boot-up ----------
   var BOOT_MIN_MS = 1000;
