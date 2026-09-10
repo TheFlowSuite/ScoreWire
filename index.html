@@ -377,25 +377,36 @@
   @keyframes ppPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
   .tabbr .tball{width:26px;height:auto;flex-shrink:0;}
 
-  /* Scale ticker chip content to the ticker bar's OWN rendered height (cqh = 1% of the
-     container's block size) instead of the raw viewport. The vh-based sizing above is now
-     just a fallback for browsers without container query units -- on its own it was wrong
-     any time the header/footer chrome didn't take up the same share of the screen every
-     device assumed, e.g. a narrow phone where the league pills wrap to several rows: the
-     ticker's actual remaining height shrinks, but content kept sizing off 100% of the whole
-     screen and badly overflowed. container-type:size lets #tickerBar/#trackedTickerBar act
-     as that sizing context for their own descendants. */
+  /* Scale ticker chip content to the ticker bar's OWN rendered size. The original recipe sized
+     everything off cqh (1% of the container's height) alone -- fine for a short, wide
+     landscape/TV ticker, where height is naturally the tight dimension and width has plenty of
+     slack. But on a tall, narrow view -- a phone or iPad in portrait, where the Ticker tab is a
+     full-height panel -- height is the LARGER dimension, so cqh let logos and score digits
+     balloon far past the container's own width: a single game's chip ended up wider than the
+     screen and got center-clipped by tickerBar's overflow:hidden, leaving huge dead space
+     above/below and only slivers of the logos visible at each edge. Switching to cqmin (smaller
+     of width/height) alone wasn't quite enough either: on a MILDLY portrait container (e.g. an
+     iPad in portrait, only slightly taller than wide) cqmin still equals the width, and the
+     same height-tuned percentages (two ~30%-of-the-short-side logos plus a big score) add up to
+     well over 100% of that width on their own. So every property that actually contributes to
+     the chip's WIDTH (logo size, score font, the gaps and padding between them) is capped by
+     BOTH cqh and a separate, smaller cqw budget via min() -- sized so two logos + the score +
+     their gaps/padding can never add up to more than the container is actually wide, no matter
+     the aspect ratio. Purely vertical/independent sizing (the tchip column gap, league pill and
+     status text) still just uses cqh, since it was never what was overflowing. container-
+     type:size lets #tickerBar/#trackedTickerBar act as that sizing context for their own
+     descendants. */
   #tickerBar, #trackedTickerBar{container-type:size;}
-  .tchip{gap:clamp(12px,2.8cqh,28px);padding:0 clamp(44px,8cqh,92px);}
-  .tgame{gap:clamp(28px,4.8cqh,52px);}
-  .tteam .tlogo{width:clamp(120px,30cqh,320px);height:clamp(120px,30cqh,320px);}
-  .tteam .tabbr{font-size:clamp(20px,3.1cqh,30px);}
-  .tscore{gap:clamp(16px,2.8cqh,32px);font-size:clamp(84px,23cqh,212px);}
-  .tmeta .lg{font-size:clamp(16px,2.4cqh,22px);}
-  .tmeta .st{font-size:clamp(18px,2.6cqh,26px);}
-  .tsit .tdiamond{width:clamp(40px,6cqh,60px);height:clamp(40px,6cqh,60px);}
-  .tsit .tball{width:clamp(36px,5.2cqh,52px);}
-  .tsit .bso{font-size:clamp(18px,2.8cqh,26px);}
+  .tchip{gap:clamp(12px,2.8cqh,28px);padding:0 clamp(16px,min(8cqh,6.4cqw),92px);}
+  .tgame{gap:clamp(10px,min(4.8cqh,3.84cqw),52px);}
+  .tteam .tlogo{width:clamp(44px,min(30cqh,24cqw),320px);height:clamp(44px,min(30cqh,24cqw),320px);}
+  .tteam .tabbr{font-size:clamp(12px,min(3.1cqh,2.5cqw),30px);}
+  .tscore{gap:clamp(6px,min(2.8cqh,2.25cqw),32px);font-size:clamp(32px,min(23cqh,13.8cqw),212px);}
+  .tmeta .lg{font-size:clamp(11px,2.4cqh,22px);}
+  .tmeta .st{font-size:clamp(12px,2.6cqh,26px);}
+  .tsit .tdiamond{width:clamp(18px,min(6cqh,4.8cqw),60px);height:clamp(18px,min(6cqh,4.8cqw),60px);}
+  .tsit .tball{width:clamp(16px,min(5.2cqh,4.16cqw),52px);}
+  .tsit .bso{font-size:clamp(11px,min(2.8cqh,2.25cqw),26px);}
 
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 
@@ -914,6 +925,25 @@
     fillTickerRail(mainRail, mainBar, favGames.map(chipHTML), 5.4, 20);
   }
 
+  // Cuts play text down to a compact, glanceable snippet instead of trusting card width
+  // alone -- a wide TV-layout card has room to show a whole sentence uncut, which reads as
+  // cluttered next to the rest of this app's terse, at-a-glance style. Breaks on a word
+  // boundary rather than mid-word where it reasonably can, then adds an ellipsis. The CSS
+  // white-space:nowrap/text-overflow:ellipsis on .lastPlay stays on top of this as a safety
+  // net for the rare card too narrow even for the shortened text.
+  var LAST_PLAY_MAX_CHARS = 48;
+  function truncatePlayText(text, maxLen){
+    if(!text || text.length <= maxLen) return text;
+    var cut = text.slice(0, maxLen);
+    var lastSpace = cut.lastIndexOf(' ');
+    if(lastSpace > maxLen * 0.6) cut = cut.slice(0, lastSpace);
+    return cut.replace(/[.,;:\s]+$/, '') + '…';
+  }
+
+  function escapeAttr(s){
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
   function cardHTML(g){
     var live = g.state === 'in';
     var statusCls = live ? 'status live' : 'status';
@@ -927,7 +957,9 @@
       // If the situational row already drew a top border to separate itself from the team
       // rows, this just continues below it -- otherwise (no situational row, e.g. the game
       // has since gone final) it needs its own border to still read as a separate line.
-      lastPlayHTML = '<div class="lastPlay' + (sitHTML ? '' : ' bordered') + '">' + g.lastScoringPlay + '</div>';
+      // title="" carries the untruncated text, so a mouse user can still hover for the rest.
+      lastPlayHTML = '<div class="lastPlay' + (sitHTML ? '' : ' bordered') + '" title="' + escapeAttr(g.lastScoringPlay) + '">' +
+        truncatePlayText(g.lastScoringPlay, LAST_PLAY_MAX_CHARS) + '</div>';
     }
     return '' +
       '<div class="card' + (pinned ? ' pinned' : '') + '" style="border-left-color:var(--' + g.league + ');box-shadow:-6px 0 16px -8px var(--' + g.league + ')">' +
