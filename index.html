@@ -279,12 +279,20 @@
      overflow:hidden -- fine for small text, but a big glowing team logo mid-crossing reads as
      abruptly "cut in half" rather than smoothly leaving the screen (more noticeable the bigger
      the logo renders, e.g. on iPad, than on a cramped phone where logos are already small).
-     A soft edge mask fades each chip out before it hits the hard boundary, so logos ease off
-     the sides instead of snapping away. Needs the -webkit- prefix for iOS/iPadOS Safari. */
-  #tickerBar, #trackedTickerBar{
-    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
-    mask-image:linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
-  }
+     A first attempt at this used a CSS mask-image (a gradient fading the element's own alpha
+     out toward each edge) -- it looked right in testing here, but real iPadOS Safari rendered
+     it as a dead hard cut with no fade at all, confirmed pixel-for-pixel against a screenshot
+     (solid black for 0 alpha, then an instant jump straight to full-white with nothing in
+     between), especially reliably wrong once the ticker is in true fullscreen. mask-image
+     support has a real history of being flaky like this on WebKit, so instead of chasing that,
+     this uses plain opaque-to-transparent gradient divs stacked on top of the rail (.tfade,
+     in the HTML markup) -- ordinary backgrounds, nothing exotic, so there's nothing for any
+     browser to get wrong: they just paint the same near-black ticker background over the
+     chips right as they'd otherwise reach the hard edge. */
+  .tfade{position:absolute;top:0;bottom:0;width:10%;min-width:40px;max-width:140px;pointer-events:none;z-index:5;}
+  .tfade-l{left:0;background:linear-gradient(90deg, #000 0%, rgba(0,0,0,.85) 35%, transparent 100%);}
+  .tfade-r{right:0;background:linear-gradient(270deg, #000 0%, rgba(0,0,0,.85) 35%, transparent 100%);}
+  #tickerBar.static .tfade, #trackedTickerBar.static .tfade{display:none;}
   #tickerBar .rail{display:flex;align-items:stretch;white-space:nowrap;animation:scroll 54s linear infinite;height:100%;}
   #tickerBar.static, #trackedTickerBar.static{justify-content:center;}
   @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
@@ -519,10 +527,10 @@
     <div class="view" id="view-scoreboard"></div>
     <div class="view" id="view-live"></div>
     <div class="view" id="view-tracked">
-      <div id="trackedTickerBar"><div class="rail" id="trackedTickerRail"></div></div>
+      <div id="trackedTickerBar"><div class="rail" id="trackedTickerRail"></div><div class="tfade tfade-l"></div><div class="tfade tfade-r"></div></div>
     </div>
     <div class="view" id="view-ticker">
-      <div id="tickerBar"><div class="rail" id="tickerRail"></div></div>
+      <div id="tickerBar"><div class="rail" id="tickerRail"></div><div class="tfade tfade-l"></div><div class="tfade tfade-r"></div></div>
     </div>
   </main>
 
