@@ -77,7 +77,10 @@
     z-index:10;
   }
   header.hidden{border-bottom-color:transparent;box-shadow:none;row-gap:0;}
-  header.hidden > *:not(.brand){opacity:0;pointer-events:none;}
+  /* The clock stays lit alongside the brand logo even while the rest of the kiosk chrome
+     fades out on idle -- on a TV/iPad display sitting untouched for a while, it's the one
+     piece of header info still worth having at a glance. */
+  header.hidden > *:not(.brand):not(#clock){opacity:0;pointer-events:none;}
   header > *:not(.brand){transition:opacity .5s ease;}
   /* Fading the pills/toggle rows to opacity:0 wasn't enough on the compact (<1300px) layout --
      they were still full flex rows reserving their own height, so the header kept its full
