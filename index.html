@@ -404,6 +404,9 @@
   }
   .tsit.redzone .bso{color:var(--live);text-shadow:0 0 12px rgba(255,59,59,.6);}
   .tsit.powerplay .bso{color:var(--neon-cyan);text-shadow:0 0 14px rgba(0,240,255,.7);animation:ppPulse 1s ease-in-out infinite;}
+  /* Reserves this row's height on a ticker chip with nothing live to show -- see tsitSlotHTML --
+     so a scheduled/final chip's logo row lines up with a live chip's instead of sitting lower. */
+  .tsit.tsit-empty{visibility:hidden;}
   @keyframes ppPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
   .tabbr .tball{width:26px;height:auto;flex-shrink:0;}
 
@@ -634,6 +637,7 @@
     games: {},        // leagueKey -> array of normalized games (or null if failed to load)
     lastUpdated: null,
     prevScores: {},   // gameId -> {away, home} scores as of the previous load, for the score-change flash
+    pendingFlash: {}, // "<gameId>-away"/"-home" -> {fav, ts} for a changed score the ticker hasn't shown on screen yet
     favorites: loadFavorites() // Set of "league:teamId" strings pinned to the front of the ticker
   };
 
@@ -895,9 +899,33 @@
   }
 
   // Compares this load's scores against the previous load's, per game, so the ticker/scoreboard
-  // can flash just the number(s) that actually moved instead of re-flashing everything every refresh.
+  // can flash just the number(s) that actually moved instead of re-flashing everything every
+  // refresh. Also feeds state.pendingFlash (see chipHTML/armFlashObservers below): the
+  // scoreboard's cards are always fully visible, so they can keep flashing immediately as
+  // before, but a ticker chip can easily be scrolled off-screen at the exact moment its score
+  // changes. pendingFlash keeps that change "on the hook" across renders until the chip has
+  // actually scrolled into view at least once, instead of wasting the flash on an empty
+  // stretch of screen.
+  //
+  // Each pending entry carries a `shown` flag rather than being deleted the instant it's first
+  // displayed. That matters because a single poll cycle doesn't call render() only once --
+  // refreshLastScoringPlays() (below) kicks off its own fetch and calls render() again a beat
+  // later once that resolves, which rebuilds the ticker's chip elements from scratch. Deleting
+  // the entry on first display would mean that second, incidental render loses the flash
+  // outright (the freshly rebuilt chip has nothing telling it to still be lit up). Keeping the
+  // entry around with shown:true instead means any render for the rest of this cycle still
+  // paints the highlight -- and it only gets swept away for real at the top of the *next*
+  // markScoreChanges() call, once its moment has actually passed.
+  var PENDING_FLASH_MAX_AGE_MS = 90000;
   function markScoreChanges(){
     var seen = {};
+    var now = Date.now();
+    // Retire anything that already had its moment on screen last cycle, or that's simply been
+    // waiting too long to ever be seen (its game scrolled out of the current league filter, say).
+    Object.keys(state.pendingFlash).forEach(function(key){
+      var info = state.pendingFlash[key];
+      if(info.shown || now - info.ts > PENDING_FLASH_MAX_AGE_MS) delete state.pendingFlash[key];
+    });
     Object.keys(state.games).forEach(function(k){
       var games = state.games[k];
       if(!games) return;
@@ -906,6 +934,9 @@
         if(prev){
           g.awayChanged = prev.away !== g.away.score;
           g.homeChanged = prev.home !== g.home.score;
+          var fav = gameHasFavorite(g);
+          if(g.awayChanged) state.pendingFlash[g.id + '-away'] = {fav: fav, ts: now, shown: false};
+          if(g.homeChanged) state.pendingFlash[g.id + '-home'] = {fav: fav, ts: now, shown: false};
         }
         seen[g.id] = {away: g.away.score, home: g.home.score};
       });
@@ -1123,12 +1154,55 @@
       rail.innerHTML = chipsHtml.join('');
       rail.style.animation = 'none';
       container.classList.add('static');
+      armFlashObservers(container, rail);
       return;
     }
     container.classList.remove('static');
     rail.innerHTML = chipsHtml.join('') + chipsHtml.join('');
     var seconds = Math.max(minSeconds, chipsHtml.length * secondsPerChip);
     rail.style.animation = 'scroll ' + seconds + 's linear infinite';
+    armFlashObservers(container, rail);
+  }
+
+  // Turns a state.pendingFlash entry into what chipHTML should put on a score span: still
+  // nothing to show yet (no entry), watch-and-wait (data-flash-key, no class -- see
+  // armFlashObservers), or already confirmed visible this cycle (apply the highlight class
+  // directly, no need to watch again).
+  function flashPartsFor(key){
+    var info = state.pendingFlash[key];
+    if(!info) return {cls: '', attr: ''};
+    if(info.shown) return {cls: ' ' + (info.fav ? 'flash-fav' : 'flash'), attr: ''};
+    return {cls: '', attr: ' data-flash-key="' + key + '"'};
+  }
+
+  // Watches every score just marked data-flash-key (see chipHTML/flashPartsFor) and plays its
+  // .flash/.flash-fav highlight the moment it's actually visible inside this ticker's own
+  // clipped viewport -- immediately, if the chip already happens to be on screen, or whenever
+  // it next scrolls into view otherwise. Scoped to `container` (the overflow:hidden ticker bar)
+  // as the observer root rather than the page viewport, since that's the box that actually
+  // clips what the person can see. Marks the pendingFlash entry shown (rather than deleting it)
+  // so an incidental extra render later in this same cycle -- refreshLastScoringPlays() calls
+  // render() again once its own fetch resolves -- still paints the highlight on the freshly
+  // rebuilt chip instead of silently losing it; markScoreChanges() retires shown entries once
+  // the next cycle starts.
+  function armFlashObservers(container, rail){
+    var pending = rail.querySelectorAll('[data-flash-key]');
+    if(!pending.length) return;
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        var el = entry.target;
+        var key = el.getAttribute('data-flash-key');
+        var info = state.pendingFlash[key];
+        if(info){
+          el.classList.add(info.fav ? 'flash-fav' : 'flash');
+          info.shown = true;
+        }
+        el.removeAttribute('data-flash-key');
+        obs.unobserve(el);
+      });
+    }, {root: container, threshold: 0.5});
+    pending.forEach(function(el){ obs.observe(el); });
   }
 
   var LEAGUE_FALLBACK_COLOR = {mlb:'#7a1fd6', nba:'#e0651f', nfl:'#2e6bff', nhl:'#16b3a3', ncaaf:'#b5342d', ncaab:'#d6006c'};
@@ -1244,11 +1318,29 @@
     return '';
   }
 
+  // Ticker-only wrapper around situationRowHTML() -- see the comment in chipHTML() for why.
+  // When there's nothing live to show, renders an invisible row built from the same
+  // .tdiamond/.bso classes a real one uses, so it reserves the identical height (whatever that
+  // currently clamps/container-queries out to) without hand-duplicating those size rules.
+  function tsitSlotHTML(g){
+    return situationRowHTML(g) ||
+      '<div class="tsit tsit-empty"><span class="tdiamond"></span><span class="bso">&nbsp;</span></div>';
+  }
+
   function chipHTML(g){
     var live = g.state === 'in';
     var stInner = live ? '<span class="dot"></span>' + statusLabel(g) : statusLabel(g);
     var stCls = live ? 'st live' : 'st';
-    var situationHTML = situationRowHTML(g);
+    // situationRowHTML() returns '' for anything without live in-game detail (pregame, final,
+    // or a league with no situational feed) -- but .tchip vertically centers its whole column
+    // of content, so a chip that's missing this row ends up with LESS total content height
+    // than one that has it, which shifts that chip's logo row to a different vertical position
+    // than its neighbors. tsitSlotHTML always reserves the row's space (invisible when there's
+    // nothing to show) so every chip has the same total content height and the logo row lines
+    // up across the whole ticker regardless of which chips are currently live. Scoped to the
+    // ticker only -- the Scoreboard/Live card view uses situationRowHTML() directly and is
+    // unaffected.
+    var situationHTML = tsitSlotHTML(g);
     var awayIcon = '', homeIcon = '';
     if(g.league === 'mlb' && live && g.situation && g.situation.battingSide){
       if(g.situation.battingSide === 'away') awayIcon = baseballIcon();
@@ -1261,16 +1353,24 @@
       else if(g.situation.ppSide === 'home') homeIcon = powerPlayIcon();
     }
     var pinned = gameHasFavorite(g);
-    var awayFlashCls = g.awayChanged ? (pinned ? ' flash-fav' : ' flash') : '';
-    var homeFlashCls = g.homeChanged ? (pinned ? ' flash-fav' : ' flash') : '';
+    // Ticker chips don't flash a changed score immediately the way Scoreboard cards do --
+    // a chip can easily be scrolled off-screen right when its score updates, which would waste
+    // a one-shot flash on nothing. Instead, a pending-and-not-yet-shown change gets marked with
+    // data-flash-key and armFlashObservers() (see fillTickerRail) triggers the actual
+    // .flash/.flash-fav animation via IntersectionObserver the moment this chip scrolls into
+    // view -- immediately if it's already visible, or whenever it next comes around the loop
+    // otherwise. Once it's been shown at least once this cycle, later rebuilds of this same
+    // chip (see markScoreChanges' shown-flag comment) apply the highlight class directly.
+    var away = flashPartsFor(g.id + '-away');
+    var home = flashPartsFor(g.id + '-home');
     return '' +
       '<div class="tchip' + (pinned ? ' pinned' : '') + '" data-l="' + g.league + '">' +
         '<div class="tgame">' +
           tickerTeamHTML(g.away, g.league, awayIcon) +
           '<div class="tscore">' +
-            '<span class="s' + awayFlashCls + '">' + g.away.score + '</span>' +
+            '<span class="s' + away.cls + '"' + away.attr + '>' + g.away.score + '</span>' +
             '<span class="dash">&ndash;</span>' +
-            '<span class="s' + homeFlashCls + '">' + g.home.score + '</span>' +
+            '<span class="s' + home.cls + '"' + home.attr + '>' + g.home.score + '</span>' +
           '</div>' +
           tickerTeamHTML(g.home, g.league, homeIcon) +
         '</div>' +
