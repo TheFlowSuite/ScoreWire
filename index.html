@@ -289,7 +289,14 @@
      in the HTML markup) -- ordinary backgrounds, nothing exotic, so there's nothing for any
      browser to get wrong: they just paint the same near-black ticker background over the
      chips right as they'd otherwise reach the hard edge. */
-  .tfade{position:absolute;top:0;bottom:0;width:10%;min-width:40px;max-width:140px;pointer-events:none;z-index:5;}
+  /* The fade zone has to be at least as wide as the biggest thing crossing it -- a round team
+     logo, sized by the exact same clamp(...,min(Xcqh,Ycqw),...) recipe as .tteam .tlogo above.
+     The first version of this fade used a flat 10%/40-140px zone, far narrower than a
+     200-300px logo on an iPad: the logo was still most of the way opaque by the time its own
+     curved edge hit the true overflow:hidden boundary, so it still looked hard-clipped into a
+     crescent instead of fading away. Matching (and slightly exceeding) the logo's own formula
+     here guarantees it's fully faded to invisible well before it's ever geometrically cut. */
+  .tfade{position:absolute;top:0;bottom:0;width:clamp(90px,min(42cqh,34cqw),380px);pointer-events:none;z-index:5;}
   .tfade-l{left:0;background:linear-gradient(90deg, #000 0%, rgba(0,0,0,.85) 35%, transparent 100%);}
   .tfade-r{right:0;background:linear-gradient(270deg, #000 0%, rgba(0,0,0,.85) 35%, transparent 100%);}
   #tickerBar.static .tfade, #trackedTickerBar.static .tfade{display:none;}
