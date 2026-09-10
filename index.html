@@ -275,6 +275,16 @@
       radial-gradient(ellipse 70% 90% at 50% 50%, rgba(255,46,196,.04), transparent 70%),
       #000;
   }
+  /* Scrolling chips reach the tickerBar's own left/right edges and get hard-clipped by
+     overflow:hidden -- fine for small text, but a big glowing team logo mid-crossing reads as
+     abruptly "cut in half" rather than smoothly leaving the screen (more noticeable the bigger
+     the logo renders, e.g. on iPad, than on a cramped phone where logos are already small).
+     A soft edge mask fades each chip out before it hits the hard boundary, so logos ease off
+     the sides instead of snapping away. Needs the -webkit- prefix for iOS/iPadOS Safari. */
+  #tickerBar, #trackedTickerBar{
+    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
+    mask-image:linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  }
   #tickerBar .rail{display:flex;align-items:stretch;white-space:nowrap;animation:scroll 54s linear infinite;height:100%;}
   #tickerBar.static, #trackedTickerBar.static{justify-content:center;}
   @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
