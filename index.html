@@ -276,19 +276,15 @@
       #000;
   }
   /* Scrolling chips reach the tickerBar's own left/right edges and get hard-clipped by
-     overflow:hidden -- fine for small text, but a big glowing team logo mid-crossing reads as
-     abruptly "cut in half" rather than smoothly leaving the screen (more noticeable the bigger
-     the logo renders, e.g. on iPad, than on a cramped phone where logos are already small).
-     Two different CSS-only attempts at fixing this (a mask-image fade, then plain gradient
-     overlay divs) both looked right in testing here but rendered as a dead, zero-transition
-     hard cut on the real device, confirmed pixel-for-pixel against screenshots each time
-     (solid black, then an instant jump straight to full brightness with nothing in between,
-     regardless of how wide the fade zone was declared). With two independent CSS techniques
-     both silently inert there, the fade is instead computed and applied in JS -- see
-     fadeTickerEdges() -- which reads each element's real on-screen position every animation
-     frame and sets its opacity directly. That has no CSS gradient/mask feature for any
-     browser to get subtly wrong; opacity is about as universally reliable as browser
-     rendering gets. */
+     overflow:hidden -- a big glowing team logo mid-crossing reads as abruptly "cut in half"
+     rather than smoothly leaving the screen. Tried fixing this three different ways (a
+     mask-image fade, gradient overlay divs, then a JS-computed opacity fade) -- the first two
+     silently did nothing on the real iPad despite working in every test here, and the JS
+     version fixed the cut but caused the whole kiosk display to gradually fade to black over
+     long standalone-app runtimes (the per-frame position reads were expensive enough to bog
+     down rendering over hours of continuous use). A rock-solid ticker that runs for hours
+     without incident matters more than a cosmetic edge transition, so this has been removed --
+     back to the plain hard cut. */
   #tickerBar .rail{display:flex;align-items:stretch;white-space:nowrap;animation:scroll 54s linear infinite;height:100%;}
   #tickerBar.static, #trackedTickerBar.static{justify-content:center;}
   @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
@@ -1278,52 +1274,6 @@
   }
   document.addEventListener('fullscreenchange', handleFullscreenChange);
   document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-
-  // ---------- ticker edge fade (JS-computed, not CSS) ----------
-  // A scrolling chip reaching the tickerBar's left/right edge gets hard-clipped by
-  // overflow:hidden -- a big team logo mid-crossing reads as abruptly "cut in half" rather
-  // than easing off screen. Two separate CSS-only fixes for this (a mask-image fade, then
-  // plain gradient overlay divs) both looked right in testing but turned out to render as a
-  // dead, instant hard cut on a real iPad with zero transition, confirmed pixel-for-pixel
-  // against screenshots -- some combination of this app's layering (container queries,
-  // filter glows, an animated transform, all stacked together) apparently defeats both
-  // techniques there in a way that never showed up anywhere this was tested. Rather than
-  // find a third CSS trick to hope works, this computes the fade directly: every animation
-  // frame, for each team/score/status block still inside a scrolling (non-static) ticker,
-  // measure its real on-screen distance from the bar's own edges via getBoundingClientRect
-  // and set its opacity from that -- plain arithmetic and a style write, nothing for any
-  // browser's CSS engine to get subtly wrong. The fade distance is derived from however wide
-  // a logo is ACTUALLY rendering right now (read live off the page), so it automatically
-  // stays big enough to fully hide one regardless of screen size or orientation.
-  function fadeTickerEdges(){
-    ['tickerBar', 'trackedTickerBar'].forEach(function(barId){
-      var bar = document.getElementById(barId);
-      if(!bar) return;
-      var barRect = bar.getBoundingClientRect();
-      if(!barRect.width){ return; }
-      if(bar.classList.contains('static')){
-        // Centered, non-scrolling display (too few games to loop) -- nothing is crossing an
-        // edge, so make sure nothing is left faded from a moment ago.
-        var staticEls = bar.querySelectorAll('.tteam, .tscore, .tmeta');
-        for(var s = 0; s < staticEls.length; s++){ staticEls[s].style.opacity = ''; }
-        return;
-      }
-      var logo = bar.querySelector('.tlogo');
-      var fadeDist = Math.max(80, (logo ? logo.getBoundingClientRect().width : 120) * 1.3);
-      var els = bar.querySelectorAll('.tteam, .tscore, .tmeta');
-      for(var i = 0; i < els.length; i++){
-        var el = els[i];
-        var r = el.getBoundingClientRect();
-        if(!r.width){ continue; }
-        var distLeft = r.left - barRect.left;
-        var distRight = barRect.right - r.right;
-        var nearest = Math.min(distLeft, distRight);
-        el.style.opacity = nearest >= fadeDist ? '' : Math.max(0, nearest / fadeDist);
-      }
-    });
-    requestAnimationFrame(fadeTickerEdges);
-  }
-  requestAnimationFrame(fadeTickerEdges);
 
   // ---------- keep the screen awake ----------
   // A kiosk display that goes to sleep after the phone/tablet's normal idle timeout defeats
